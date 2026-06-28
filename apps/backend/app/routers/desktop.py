@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.auth import require_active_user
 from app.services.ai import pipeline as ai
 from app.db import get_supabase_optional
+from app.services.platform_limits import allowed_platforms_payload, assert_platform_allowed
 
 router = APIRouter(prefix="/desktop", tags=["desktop"])
 
@@ -19,6 +20,7 @@ class OcrDraftRequest(BaseModel):
     ocr_text: str
     mode: str = "manual"  # manual | auto
     auto_delay_minutes: int | None = None
+    platform: str | None = None
 
 
 class AutoModeSettings(BaseModel):
@@ -63,8 +65,19 @@ async def desktop_draft(
         p = sb.table("agent_personas").select("*").eq("user_id", user_id).maybe_single().execute()
         persona = p.data or {}
         if body.project_id:
-            proj = sb.table("projects").select("project_json").eq("id", body.project_id).maybe_single().execute()
-            existing = (proj.data or {}).get("project_json") or {}
+            proj = (
+                sb.table("projects")
+                .select("project_json, platform")
+                .eq("id", body.project_id)
+                .eq("user_id", user_id)
+                .maybe_single()
+                .execute()
+            )
+            if proj.data:
+                existing = proj.data.get("project_json") or {}
+                platform = (body.platform or proj.data.get("platform") or "").lower()
+                if platform:
+                    assert_platform_allowed(sb, user_id, platform)
         auto_settings = _load_auto_settings(sb, user_id)
 
     if body.mode == "auto":
@@ -105,6 +118,18 @@ async def desktop_draft(
         )
         response["supported_platforms"] = list(SUPPORTED_PLATFORMS)
     return response
+
+
+@router.get("/allowed-platforms")
+async def get_allowed_platforms(user_id: str = Depends(require_active_user)):
+    sb = get_supabase_optional()
+    if not sb:
+        return {
+            "platforms_allowed": 1,
+            "used_platforms": [],
+            "available_platforms": list(SUPPORTED_PLATFORMS),
+        }
+    return allowed_platforms_payload(sb, user_id)
 
 
 @router.get("/auto-settings")

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
-from app.routers import ai, notifications, cron, desktop, agent2
+from app.routers import ai, notifications, cron, desktop, agent2, telegram_webhook
 
 app = FastAPI(title="Gigster API", version="0.1.0")
 
@@ -19,6 +19,7 @@ app.include_router(notifications.router)
 app.include_router(cron.router)
 app.include_router(desktop.router)
 app.include_router(agent2.router)
+app.include_router(telegram_webhook.router)
 
 
 @app.get("/health")

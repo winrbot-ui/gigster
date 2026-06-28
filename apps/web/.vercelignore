@@ -1,0 +1,9 @@
+node_modules
+.next
+../desktop
+../backend
+../../node_modules
+../../apps/desktop
+../../apps/backend
+../../.git
+../../.cursor

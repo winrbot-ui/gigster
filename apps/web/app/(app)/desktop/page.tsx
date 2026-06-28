@@ -36,6 +36,8 @@ export default async function DesktopPage() {
     .maybeSingle();
 
   const platforms = sub?.platforms_allowed ?? 1;
+  const downloadUrl = process.env.NEXT_PUBLIC_DESKTOP_DOWNLOAD_URL?.trim() ?? "";
+  const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME?.trim().replace(/^@/, "") ?? "";
 
   return (
     <>
@@ -50,17 +52,41 @@ export default async function DesktopPage() {
           <CardHeader>
             <CardTitle>Download (Windows)</CardTitle>
             <CardDescription>
-              The installer is being prepared. Until it is published here, run the app from source on your PC.
+              {downloadUrl
+                ? "Install the Gigster Desktop app to monitor message tabs and receive Telegram alarms."
+                : "Installer URL not configured yet — build locally or wait for the published release."}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-3 text-sm">
-            <p className="text-muted">
-              Installer build is the next release step. Your membership is already active — you can set up Agent persona and projects now.
-            </p>
-            <code className="rounded bg-surface-2 px-3 py-2 text-xs">
-              npm install && npm run dev:desktop
-            </code>
-            <p className="text-muted">Requires Rust + Tauri. Full setup: see repo <code>apps/desktop/</code>.</p>
+            {downloadUrl ? (
+              <>
+                <a
+                  href={downloadUrl}
+                  className={buttonClasses("primary", "md")}
+                  download
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Download Gigster for Windows
+                </a>
+                <p className="text-muted">
+                  After install, sign in with the same @nickname and password as this website.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-muted">
+                  Admin: set <code>NEXT_PUBLIC_DESKTOP_DOWNLOAD_URL</code> on Vercel after uploading the
+                  .exe (GitHub Release or Supabase Storage).
+                </p>
+                <code className="rounded bg-surface-2 px-3 py-2 text-xs">
+                  npm install && npm run build --workspace @gigster/desktop
+                </code>
+                <p className="text-muted">
+                  Output: <code>apps/desktop/src-tauri/target/release/bundle/nsis/</code>
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -90,7 +116,22 @@ export default async function DesktopPage() {
                   <p className="text-sm text-muted">
                     {tg.linked_at
                       ? "Telegram linked."
-                      : "Open Telegram → Gigster bot → /start → paste this code."}
+                      : botUsername
+                        ? (
+                            <>
+                              Open{" "}
+                              <a
+                                href={`https://t.me/${botUsername}`}
+                                className="text-accent-strong hover:underline"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                @{botUsername}
+                              </a>
+                              {" "}→ /start → paste this code.
+                            </>
+                          )
+                        : "Open Telegram → Gigster bot → /start → paste this code."}
                   </p>
                 </>
               ) : (

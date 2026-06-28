@@ -25,8 +25,10 @@ Add for **Production** (copy values from `apps/web/.env.local`):
 | `NEXT_PUBLIC_SUPABASE_URL` | your Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon key from Supabase |
 | `SUPABASE_SERVICE_ROLE_KEY` | service_role (Production only, secret) |
-| `GIGSTER_API_URL` | backend URL when Railway is live (or leave empty for now) |
+| `GIGSTER_API_URL` | Railway backend URL — see section 9 (**not** gigster.website) |
 | `GIGSTER_USDT_TRC20_ADDRESS` | your USDT TRC-20 wallet |
+| `NEXT_PUBLIC_DESKTOP_DOWNLOAD_URL` | optional — direct link to Windows `.exe` |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | optional — bot username without `@` |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | optional — Cloudflare Turnstile |
 | `TURNSTILE_SECRET_KEY` | optional — server only |
 
@@ -62,8 +64,47 @@ Run all SQL files in order (SQL Editor → New query → paste → Run):
 2. `infra/supabase/migrations/20260627000002_auth_trigger.sql`
 3. `infra/supabase/migrations/20260627000003_rls_policies.sql`
 4. `infra/supabase/migrations/20260627000004_policies_and_marketer.sql`
+5. `infra/supabase/migrations/20260627000005_signup_ip.sql`
+6. `infra/supabase/migrations/20260627000006_auto_mode_and_milestones.sql`
 
-## 6. Namecheap DNS (Advanced DNS → gigster.website)
+## 9. Railway backend (`apps/backend`)
+
+1. **railway.app** → New → **GitHub Repository** → `winrbot-ui/gigster`
+2. Service **Settings → Root Directory:** `apps/backend`
+3. **Variables** (not Vercel `NEXT_PUBLIC_*`):
+
+```
+SUPABASE_URL=https://....supabase.co
+SUPABASE_SERVICE_ROLE_KEY=...
+SUPABASE_JWT_SECRET=...
+ANTHROPIC_API_KEY=...
+CORS_ORIGINS=https://www.gigster.website,https://gigster.website
+TELEGRAM_BOT_TOKEN=...
+TELEGRAM_WEBHOOK_SECRET=...   (or reuse CRON_SECRET)
+```
+
+4. **Networking → Generate Domain** → copy URL, e.g.  
+   `https://gigster-production-a1b2.up.railway.app`
+
+5. **Health check** (correct URL — do **not** mix with gigster.website):
+
+```
+https://YOUR-SERVICE.up.railway.app/health
+→ {"status":"ok","service":"gigster-api"}
+```
+
+6. Vercel → `GIGSTER_API_URL` = that Railway URL (no trailing slash)
+
+7. Telegram webhook (once backend is live):
+
+```bash
+# Set GIGSTER_API_URL in apps/web/.env.local to Railway URL, then:
+node scripts/set-telegram-webhook.mjs
+```
+
+**Wrong:** `https://www.gigster.websitec.railway.app` — that is not a valid Railway domain.
+
+## 10. Namecheap DNS (Advanced DNS → gigster.website)
 
 Already working for www. For apex (optional):
 
@@ -72,11 +113,11 @@ Already working for www. For apex (optional):
 | A | `@` | `76.76.21.21` |
 | CNAME | `www` | `cname.vercel-dns.com` |
 
-## 7. gigsterr.online (later — Agent 2)
+## 11. gigsterr.online (later — Agent 2)
 
 Separate Vercel project + wildcard `*.gigsterr.online`. Not needed until Agent 2 deploy.
 
-## 8. Verify live
+## 12. Verify live
 
 - `https://www.gigster.website` — landing loads
 - `/join` — invite gate

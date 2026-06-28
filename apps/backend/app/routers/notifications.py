@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from fastapi import APIRouter, Depends
 from app.auth import require_active_user
 from app.db import get_supabase_optional
+from app.services.platform_limits import assert_platform_allowed
 from app.services.telegram import notify_new_message
 
 router = APIRouter(prefix="/notifications", tags=["notifications"])
@@ -23,6 +24,7 @@ async def record_message_event(
 ):
     sb = get_supabase_optional()
     if sb:
+        assert_platform_allowed(sb, user_id, body.platform)
         sb.table("message_events").insert({
             "user_id": user_id,
             "platform": body.platform,

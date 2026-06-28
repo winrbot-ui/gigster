@@ -1,8 +1,8 @@
 "use client";
 
 import { useActionState } from "react";
-import type { ProjectRow } from "@gigster/shared-types";
-import { isBriefReady } from "@gigster/shared-types";
+import type { ProjectPlatform, ProjectRow } from "@gigster/shared-types";
+import { canUsePlatform, isBriefReady } from "@gigster/shared-types";
 import {
   createProject,
   generateBriefAction,
@@ -20,7 +20,16 @@ import { Badge } from "@/components/ui/badge";
 
 interface ProjectsViewProps {
   projects: ProjectRow[];
+  platformsAllowed: number;
+  usedPlatforms: ProjectPlatform[];
+  limitMessage: string;
 }
+
+const ALL_PLATFORMS: { value: ProjectPlatform; label: string }[] = [
+  { value: "upwork", label: "Upwork" },
+  { value: "fiverr", label: "Fiverr" },
+  { value: "freelancer", label: "Freelancer" },
+];
 
 function ProjectCard({ project: p }: { project: ProjectRow }) {
   const pj = p.project_json;
@@ -141,7 +150,12 @@ function ProjectCard({ project: p }: { project: ProjectRow }) {
   );
 }
 
-export function ProjectsView({ projects }: ProjectsViewProps) {
+export function ProjectsView({
+  projects,
+  platformsAllowed,
+  usedPlatforms,
+  limitMessage,
+}: ProjectsViewProps) {
   const [state, formAction, pending] = useActionState<ProjectActionState, FormData>(
     createProject,
     {},
@@ -157,6 +171,10 @@ export function ProjectsView({ projects }: ProjectsViewProps) {
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>New project</CardTitle>
+          <CardDescription>
+            Plan limit: {platformsAllowed} platform{platformsAllowed === 1 ? "" : "s"} · Used:{" "}
+            {usedPlatforms.length ? usedPlatforms.join(", ") : "none"}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form action={formAction} className="flex flex-wrap gap-4">
@@ -166,10 +184,25 @@ export function ProjectsView({ projects }: ProjectsViewProps) {
                 id="platform"
                 name="platform"
                 className="rounded-lg border border-border bg-surface px-3 py-2 text-sm"
+                defaultValue={
+                  ALL_PLATFORMS.find((p) =>
+                    canUsePlatform(platformsAllowed, usedPlatforms, p.value),
+                  )?.value ?? "upwork"
+                }
               >
-                <option value="upwork">Upwork</option>
-                <option value="fiverr">Fiverr</option>
-                <option value="freelancer">Freelancer</option>
+                {ALL_PLATFORMS.map((p) => {
+                  const selectable = canUsePlatform(
+                    platformsAllowed,
+                    usedPlatforms,
+                    p.value,
+                  );
+                  return (
+                    <option key={p.value} value={p.value} disabled={!selectable}>
+                      {p.label}
+                      {!selectable ? " (plan limit)" : ""}
+                    </option>
+                  );
+                })}
               </select>
             </div>
             <div className="flex flex-col gap-2">
@@ -184,6 +217,9 @@ export function ProjectsView({ projects }: ProjectsViewProps) {
           </form>
           {state.error && <p className="mt-2 text-sm text-danger">{state.error}</p>}
           {state.success && <p className="mt-2 text-sm text-success">{state.success}</p>}
+          {!state.error && usedPlatforms.length >= platformsAllowed && (
+            <p className="mt-2 text-xs text-muted">{limitMessage}</p>
+          )}
         </CardContent>
       </Card>
 

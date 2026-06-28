@@ -4,11 +4,14 @@ import { revalidatePath } from "next/cache";
 import {
   emptyProjectJson,
   isBriefReady,
+  canUsePlatform,
+  platformLimitMessage,
   type ProjectPlatform,
 } from "@gigster/shared-types";
 import { createClient } from "@/lib/supabase/server";
 import { backendFetch } from "@/lib/api";
 import { requireActive } from "@/lib/auth";
+import { getPlatformLimitContext } from "@/lib/platform-limits";
 
 export type ProjectActionState = { error?: string; success?: string };
 
@@ -24,6 +27,11 @@ export async function createProject(
     return { error: "Select a platform." };
   }
   if (!clientName) return { error: "Client name is required." };
+
+  const { platformsAllowed, usedPlatforms } = await getPlatformLimitContext(user.id);
+  if (!canUsePlatform(platformsAllowed, usedPlatforms, platform)) {
+    return { error: platformLimitMessage(platformsAllowed) };
+  }
 
   const supabase = await createClient();
   const { error } = await supabase.from("projects").insert({

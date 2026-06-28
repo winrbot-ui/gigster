@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     anthropic_api_key: str = ""
     openai_api_key: str = ""
     telegram_bot_token: str = ""
+    telegram_webhook_secret: str = ""
     vercel_token: str = ""
     vercel_team_id: str = ""
     vercel_agent2_project_name: str = "gigster-agent2-previews"
