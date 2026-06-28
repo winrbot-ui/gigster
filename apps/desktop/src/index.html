@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gigster Desktop</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; }
+    body { background: #08080a; color: #f4f4f5; margin: 0; padding: 1.5rem; max-width: 520px; }
+    h1 { font-size: 1.25rem; margin: 0 0 0.25rem; }
+    .sub { color: #a1a1aa; font-size: 0.875rem; margin-bottom: 1.25rem; }
+    section { margin-top: 1rem; padding: 1rem; border: 1px solid #232329; border-radius: 0.75rem; }
+    section h2 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #71717a; margin: 0 0 0.75rem; }
+    label { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 0.75rem; font-size: 0.8125rem; }
+    input, select, textarea {
+      background: #111114; border: 1px solid #232329; border-radius: 0.5rem;
+      color: #f4f4f5; padding: 0.5rem 0.625rem; font-size: 0.875rem;
+    }
+    textarea { min-height: 80px; resize: vertical; font-family: inherit; }
+    .row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+    .check { flex-direction: row; align-items: center; gap: 0.5rem; }
+    button {
+      background: #c8a86a; color: #0a0a0a; border: none; padding: 0.5rem 1rem;
+      border-radius: 999px; cursor: pointer; font-size: 0.875rem; font-weight: 500;
+    }
+    button.secondary { background: #232329; color: #f4f4f5; }
+    .status { font-size: 0.8125rem; color: #a1a1aa; margin-top: 0.5rem; white-space: pre-wrap; }
+    .draft, .client-read {
+      margin-top: 0.75rem; padding: 0.75rem; background: #111114; border-radius: 0.5rem;
+      font-size: 0.8125rem; white-space: pre-wrap; max-height: 120px; overflow-y: auto;
+    }
+    .hint { font-size: 0.75rem; color: #71717a; margin-top: 0.25rem; }
+  </style>
+</head>
+<body>
+  <h1>Gigster Desktop</h1>
+  <p class="sub">Reads platform messages · AI draft · Manual or Auto send</p>
+
+  <section>
+    <h2>Connection</h2>
+    <label>API URL<input id="api-url" type="url" placeholder="http://localhost:8000" /></label>
+    <label>JWT token (from web session)<input id="jwt" type="password" placeholder="eyJ..." /></label>
+    <label>Project ID<input id="project-id" type="text" placeholder="uuid from /projects" /></label>
+    <div class="row">
+      <label style="flex:1">Platform
+        <select id="platform">
+          <option value="upwork">Upwork</option>
+          <option value="fiverr">Fiverr</option>
+          <option value="freelancer">Freelancer</option>
+        </select>
+      </label>
+      <label style="flex:1">Client name<input id="client-name" type="text" placeholder="John Smith" /></label>
+    </div>
+    <button id="save-config">Save config</button>
+    <p class="status" id="config-status"></p>
+  </section>
+
+  <section>
+    <h2>Tab monitor</h2>
+    <label class="check"><input type="checkbox" id="auto-mode" /> Auto mode (app sends for you — higher ban risk)</label>
+    <label class="check"><input type="checkbox" id="disclaimer" /> I accept the platform ToS risk disclaimer</label>
+    <label>Human delay before auto-send (minutes, 3–45)
+      <input id="delay-minutes" type="number" min="3" max="45" value="15" />
+    </label>
+    <div class="row">
+      <button id="start-monitor">Start monitor</button>
+      <button id="stop-monitor" class="secondary">Stop</button>
+    </div>
+    <p class="status" id="monitor-status">Initializing…</p>
+    <p class="hint"><strong>Keep the platform messages tab focused in your browser.</strong> Manual: app reads → you copy draft → paste → Send. Auto: app reads → writes → Send → leaves after 2 min if no reply. Memory saved to project on backend.</p>
+  </section>
+
+  <section>
+    <h2>Latest from client (read automatically)</h2>
+    <div class="client-read" id="client-read">Waiting for monitor to detect a message…</div>
+  </section>
+
+  <section>
+    <h2>AI draft reply</h2>
+    <div class="draft" id="draft-output">Draft appears here when a new message is detected.</div>
+    <div class="row" style="margin-top:0.75rem">
+      <button id="copy-draft" class="secondary">Copy draft</button>
+    </div>
+    <p class="hint">Manual mode: copy this text, paste into the platform chat, click Send yourself.</p>
+  </section>
+
+  <script type="module" src="/main.js"></script>
+</body>
+</html>

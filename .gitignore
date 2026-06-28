@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+**/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -15,7 +16,9 @@
 
 # next.js
 /.next/
+**/.next/
 /out/
+**/out/
 
 # production
 /build
@@ -23,6 +26,20 @@
 # misc
 .DS_Store
 *.pem
+
+# rust / tauri
+**/src-tauri/target/
+
+# agent2 build output (regenerated)
+apps/backend/app/services/agent2/templates/site-builder/dist/
+apps/backend/app/services/agent2/templates/site-builder/data/
+
+# python
+**/__pycache__/
+*.py[cod]
+
+# cursor local plans (optional IDE artifacts)
+.cursor/
 
 # debug
 npm-debug.log*
@@ -32,10 +49,11 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!**/.env.example
 
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
+**/next-env.d.ts

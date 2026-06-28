@@ -1,0 +1,3 @@
+Extract structured project information from freelance platform message OCR text.
+Merge with existing project_json. Return valid JSON only.
+Never overwrite confirmed fields without new evidence from the client message.

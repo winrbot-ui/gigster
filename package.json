@@ -1,26 +1,23 @@
 {
-  "name": "gigster_website",
+  "name": "gigster",
   "version": "0.1.0",
   "private": true,
+  "description": "Gigster — closed-club SaaS monorepo (web, backend, desktop, shared types).",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
-  },
-  "dependencies": {
-    "next": "16.2.9",
-    "react": "19.2.4",
-    "react-dom": "19.2.4"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.9",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "dev": "npm run dev --workspace @gigster/web",
+    "dev:api": "npm run dev --workspace @gigster/backend",
+    "dev:desktop": "npm run dev --workspace @gigster/desktop",
+    "build": "npm run build --workspace @gigster/web",
+    "start": "npm run start --workspace @gigster/web",
+    "lint": "npm run lint --workspace @gigster/web",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "db:migrate": "node infra/supabase/apply-migrations.mjs",
+    "db:seed": "node scripts/seed-dev-users.mjs",
+    "desktop:activate": "node scripts/desktop-activate.mjs",
+    "db:verify": "node scripts/verify-supabase-env.mjs"
   }
 }

@@ -1,0 +1,3 @@
+Generate a build_spec JSON for Agent 2 from confirmed project_json.
+Use section kinds: hero, services, about_story, team, contact_form, cta, faq, pricing, gallery, testimonials, menu, embed, blog_list.
+Template: business, landing, or restaurant. Return JSON only.
