@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import type { UserRow } from "@gigster/shared-types";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { getSiteUrl } from "@/lib/site-url";
+import { requireUser } from "@/lib/auth";
 import {
   checkIpRateLimit,
   getClientIp,
@@ -14,7 +16,7 @@ import {
 
 export type AuthActionState = { error?: string; success?: string };
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const siteUrl = getSiteUrl();
 const emailRedirectTo = `${siteUrl}/auth/callback?next=/buy`;
 
 function normalizeUsername(raw: string): string {
@@ -233,4 +235,50 @@ export async function resendVerification(
   });
   if (error) return { error: error.message };
   return { success: "Verification email sent." };
+}
+
+export async function updatePassword(
+  _prev: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  await requireUser();
+  const current = String(formData.get("current_password") ?? "");
+  const next = String(formData.get("new_password") ?? "");
+  const confirm = String(formData.get("confirm_password") ?? "");
+
+  if (!current || next.length < 8) {
+    return { error: "Current password required. New password must be 8+ characters." };
+  }
+  if (next !== confirm) return { error: "New passwords do not match." };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user?.email) return { error: "Session expired. Log in again." };
+
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: current,
+  });
+  if (signInError) return { error: "Current password is incorrect." };
+
+  const { error } = await supabase.auth.updateUser({ password: next });
+  if (error) return { error: error.message };
+  return { success: "Password updated." };
+}
+
+export async function requestPasswordReset(
+  _prev: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  if (!email) return { error: "Enter your account email." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${getSiteUrl()}/settings?reset=1`,
+  });
+  if (error) return { error: error.message };
+  return { success: "Password reset link sent to your email." };
 }

@@ -1,7 +1,9 @@
+import { getSiteUrl } from "./site-url";
+
 export const MEMBER_MONTHLY_INVITES = 3;
 
 export function buildInviteLink(username: string): string {
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gigster.website";
+  const base = getSiteUrl();
   return `${base}/join?ref=${encodeURIComponent(username)}`;
 }
 

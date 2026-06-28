@@ -1,19 +1,16 @@
 import { AppShell } from "@/components/app/app-shell";
-import type { NavItem } from "@/components/app/app-nav";
+import { buildMemberNav } from "@/lib/nav";
 import { requireUser } from "@/lib/auth";
-
-const memberNav: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/projects", label: "Projects" },
-  { href: "/agent-setup", label: "Agent setup" },
-  { href: "/buy", label: "Membership" },
-];
 
 export default async function AppGroupLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  await requireUser();
-  return <AppShell nav={memberNav}>{children}</AppShell>;
+  const user = await requireUser();
+  const nav = buildMemberNav(user);
+  const area =
+    user.role === "admin" ? "Admin · Member" : user.role === "marketer" ? "Marketer" : undefined;
+
+  return <AppShell nav={nav} area={area}>{children}</AppShell>;
 }

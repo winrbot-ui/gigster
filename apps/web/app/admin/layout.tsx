@@ -1,19 +1,17 @@
 import { AppShell } from "@/components/app/app-shell";
-import type { NavItem } from "@/components/app/app-nav";
+import { buildMemberNav } from "@/lib/nav";
 import { requireRole } from "@/lib/auth";
-
-const adminNav: NavItem[] = [
-  { href: "/admin", label: "Overview" },
-];
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  await requireRole("admin");
+  const user = await requireRole("admin");
+  const nav = buildMemberNav(user);
+
   return (
-    <AppShell nav={adminNav} area="Admin">
+    <AppShell nav={nav} area="Admin">
       {children}
     </AppShell>
   );

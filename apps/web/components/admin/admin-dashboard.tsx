@@ -70,7 +70,10 @@ export function AdminDashboard({
 
   return (
     <>
-      <PageHeader title="Admin" description="Verify payments and manage the club." />
+      <PageHeader
+        title="Admin panel"
+        description="Same login as the dashboard — verify USDT payments, activate members, approve marketers."
+      />
       <div className="grid gap-4 sm:grid-cols-3">
         <Card>
           <CardHeader>
