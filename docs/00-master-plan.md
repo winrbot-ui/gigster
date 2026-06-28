@@ -71,3 +71,4 @@ Agent 2.
 | `05-security.md` | Gate, anti-abuse, rate limits, Turnstile, RLS, server-only prompts. |
 | `06-conventions.md` | Monorepo layout, naming, env vars, migrations, doc upkeep. |
 | `07-glossary.md` | Terms: @nickname, roles, Manual/Auto, qualified, milestone. |
+| `08-deploy.md` | Vercel + Railway production deploy steps. |

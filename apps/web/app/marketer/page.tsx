@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { requireRole } from "@/lib/auth";
-import { getMarketerStats, MARKETER_TIERS } from "@/app/actions/marketer";
+import { getMarketerStats } from "@/app/actions/marketer";
+import { MARKETER_TIERS } from "@/lib/marketer-tiers";
 import { PageHeader } from "@/components/app/app-shell";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

@@ -35,6 +35,8 @@ npm run build
 Copy `.env.example` to `apps/web/.env.local` and `apps/backend/.env`.
 Apply SQL migrations from `infra/supabase/migrations/` to your Supabase project.
 
+**Production deploy:** see [`docs/08-deploy.md`](./docs/08-deploy.md) (Vercel web + Railway backend).
+
 ## Tech stack
 
 - **Frontend:** Next.js 16.2.9 (App Router, Turbopack) + React 19 + Tailwind 4.
