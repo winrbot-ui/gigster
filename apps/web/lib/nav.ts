@@ -11,7 +11,7 @@ export function buildMemberNav(user: UserRow): NavItem[] {
     { href: "/settings", label: "Settings" },
   ];
 
-  if (user.status !== "active") {
+  if (user.status !== "active" && user.role !== "admin") {
     nav.push({ href: "/buy", label: "Membership" });
   }
 

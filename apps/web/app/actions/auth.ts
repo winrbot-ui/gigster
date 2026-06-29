@@ -23,7 +23,9 @@ function normalizeUsername(raw: string): string {
   return raw.trim().replace(/^@/, "").toLowerCase().replace(/[^a-z0-9_]/g, "");
 }
 
-function redirectForUser(user: Pick<UserRow, "status">): never {
+function redirectForUser(user: Pick<UserRow, "status" | "role">): never {
+  if (user.role === "admin") redirect("/admin");
+
   switch (user.status) {
     case "pending_email":
       redirect("/verify");

@@ -38,9 +38,11 @@ export async function requireRole(...roles: UserRole[]): Promise<UserRow> {
   return user;
 }
 
-/** Require an active subscription (used by the closed app group). */
+/** Require an active subscription (used by the closed app group). Admins bypass. */
 export async function requireActive(): Promise<UserRow> {
   const user = await requireUser();
+  if (user.role === "admin") return user;
+
   if (user.status !== "active") redirect("/buy");
 
   await expireStaleMembership(user.id);

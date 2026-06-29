@@ -42,8 +42,18 @@ async def require_active_user(user_id: str = Depends(get_current_user_id)) -> st
     sb = get_supabase_optional()
     if not sb:
         return user_id
-    row = sb.table("users").select("status").eq("id", user_id).single().execute()
-    if not row.data or row.data.get("status") != "active":
+    row = (
+        sb.table("users")
+        .select("status, role")
+        .eq("id", user_id)
+        .single()
+        .execute()
+    )
+    if not row.data:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Active subscription required")
+    if row.data.get("role") == "admin":
+        return user_id
+    if row.data.get("status") != "active":
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Active subscription required")
 
     sub = (
