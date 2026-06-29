@@ -5,13 +5,21 @@ import { inviteStatsFromCount } from "@/lib/invites";
 const GATE_MAX_ATTEMPTS = 3;
 const GATE_WINDOW_HOURS = 24;
 
+/** Normalize client IP for Postgres `inet` (invalid values fall back to localhost). */
+export function normalizeClientIp(raw: string | null | undefined): string {
+  const candidate = raw?.split(",")[0]?.trim() ?? "";
+  if (!candidate) return "127.0.0.1";
+  // IPv4 or IPv6 — reject hostnames / garbage from proxies
+  if (/^\d{1,3}(\.\d{1,3}){3}$/.test(candidate)) return candidate;
+  if (candidate.includes(":")) return candidate;
+  return "127.0.0.1";
+}
+
 export async function getClientIp(): Promise<string> {
   const h = await headers();
-  return (
-    h.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-    h.get("x-real-ip") ??
-    "127.0.0.1"
-  );
+  const raw =
+    h.get("x-forwarded-for") ?? h.get("x-real-ip") ?? h.get("cf-connecting-ip");
+  return normalizeClientIp(raw);
 }
 
 /** Increment IP attempt counter; returns whether the request is allowed. */
@@ -20,42 +28,61 @@ export async function checkIpRateLimit(
   maxAttempts = GATE_MAX_ATTEMPTS,
   windowHours = GATE_WINDOW_HOURS,
 ): Promise<{ allowed: boolean; remaining: number }> {
-  const ip = await getClientIp();
-  const admin = createAdminClient();
-  const now = new Date();
-  const windowStart = new Date(now.getTime() - windowHours * 60 * 60 * 1000);
+  try {
+    const ip = await getClientIp();
+    const admin = createAdminClient();
+    const now = new Date();
+    const windowStart = new Date(now.getTime() - windowHours * 60 * 60 * 1000);
 
-  const { data: existing } = await admin
-    .from("ip_attempts")
-    .select("*")
-    .eq("ip", ip)
-    .eq("endpoint", endpoint)
-    .maybeSingle();
+    const { data: existing, error: readErr } = await admin
+      .from("ip_attempts")
+      .select("*")
+      .eq("ip", ip)
+      .eq("endpoint", endpoint)
+      .maybeSingle();
 
-  if (!existing || new Date(existing.window_start) < windowStart) {
-    await admin.from("ip_attempts").upsert(
-      {
-        ip,
-        endpoint,
-        attempt_count: 1,
-        window_start: now.toISOString(),
-      },
-      { onConflict: "ip,endpoint" },
-    );
-    return { allowed: true, remaining: maxAttempts - 1 };
+    if (readErr) {
+      console.error("ip_attempts read failed:", readErr.message);
+      return { allowed: true, remaining: maxAttempts };
+    }
+
+    if (!existing || new Date(existing.window_start) < windowStart) {
+      const { error: upsertErr } = await admin.from("ip_attempts").upsert(
+        {
+          ip,
+          endpoint,
+          attempt_count: 1,
+          window_start: now.toISOString(),
+        },
+        { onConflict: "ip,endpoint" },
+      );
+      if (upsertErr) {
+        console.error("ip_attempts upsert failed:", upsertErr.message);
+        return { allowed: true, remaining: maxAttempts };
+      }
+      return { allowed: true, remaining: maxAttempts - 1 };
+    }
+
+    const nextCount = existing.attempt_count + 1;
+    const { error: updateErr } = await admin
+      .from("ip_attempts")
+      .update({ attempt_count: nextCount })
+      .eq("ip", ip)
+      .eq("endpoint", endpoint);
+
+    if (updateErr) {
+      console.error("ip_attempts update failed:", updateErr.message);
+      return { allowed: true, remaining: maxAttempts };
+    }
+
+    return {
+      allowed: nextCount <= maxAttempts,
+      remaining: Math.max(0, maxAttempts - nextCount),
+    };
+  } catch (err) {
+    console.error("checkIpRateLimit failed:", err);
+    return { allowed: true, remaining: maxAttempts };
   }
-
-  const nextCount = existing.attempt_count + 1;
-  await admin
-    .from("ip_attempts")
-    .update({ attempt_count: nextCount })
-    .eq("ip", ip)
-    .eq("endpoint", endpoint);
-
-  return {
-    allowed: nextCount <= maxAttempts,
-    remaining: Math.max(0, maxAttempts - nextCount),
-  };
 }
 
 export async function verifyTurnstile(token: string | null): Promise<boolean> {

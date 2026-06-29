@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from fastapi import APIRouter, Depends, Header, HTTPException
 from app.config import settings
 from app.services.referrals import run_referral_churn_clawback, run_referral_qualification
+from app.services.subscriptions import run_expiry_warnings, run_subscription_expiry
 from app.services.agent2.worker import run_agent2
 
 router = APIRouter(prefix="/cron", tags=["cron"])
@@ -24,6 +25,18 @@ async def qualify_referrals(x_cron_secret: str | None = Header(default=None)):
 async def clawback_churned_referrals(x_cron_secret: str | None = Header(default=None)):
     _verify_cron(x_cron_secret)
     return await run_referral_churn_clawback()
+
+
+@router.post("/subscriptions/expire")
+async def expire_subscriptions(x_cron_secret: str | None = Header(default=None)):
+    _verify_cron(x_cron_secret)
+    return await run_subscription_expiry()
+
+
+@router.post("/subscriptions/warn-expiry")
+async def warn_expiring_subscriptions(x_cron_secret: str | None = Header(default=None)):
+    _verify_cron(x_cron_secret)
+    return await run_expiry_warnings()
 
 
 class Agent2RetryRequest(BaseModel):

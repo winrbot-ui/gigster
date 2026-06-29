@@ -4,13 +4,15 @@ from __future__ import annotations
 
 from fastapi import HTTPException
 
+from app.services.subscriptions import subscription_is_live
+
 SUPPORTED_PLATFORMS = frozenset({"upwork", "fiverr", "freelancer"})
 
 
 def _active_subscription(sb, user_id: str) -> dict | None:
     row = (
         sb.table("subscriptions")
-        .select("platforms_allowed, plan")
+        .select("platforms_allowed, plan, active, expires_at")
         .eq("user_id", user_id)
         .eq("active", True)
         .order("expires_at", desc=True)
@@ -18,7 +20,9 @@ def _active_subscription(sb, user_id: str) -> dict | None:
         .maybe_single()
         .execute()
     )
-    return row.data
+    if subscription_is_live(row.data):
+        return row.data
+    return None
 
 
 def used_platforms(sb, user_id: str) -> set[str]:

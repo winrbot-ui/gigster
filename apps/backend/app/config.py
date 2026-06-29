@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     agent2_domain: str = "gigsterr.online"
     cron_secret: str = ""
     cors_origins: str = "http://localhost:3000,https://gigster.website"
+    resend_api_key: str = ""
+    resend_from: str = "Gigster <noreply@gigster.website>"
+    site_url: str = "https://www.gigster.website"
 
 
 settings = Settings()

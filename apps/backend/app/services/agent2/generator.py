@@ -17,40 +17,75 @@ def _load_prompt() -> str:
     return "Enrich build_spec JSON. Return valid JSON only."
 
 
+def _all_sections(spec: dict) -> list:
+    pages = spec.get("pages")
+    if isinstance(pages, list) and pages:
+        out = []
+        for page in pages:
+            if isinstance(page, dict):
+                out.extend(page.get("sections") or [])
+        return out
+    return spec.get("sections") or []
+
+
 def pick_template(spec: dict) -> str:
     """Return template id; prefer explicit template, infer from sections if needed."""
     template = spec.get("template")
     if template in ("business", "landing", "restaurant"):
         return template
 
-    kinds = {s.get("kind") for s in spec.get("sections") or [] if isinstance(s, dict)}
+    kinds = {s.get("kind") for s in _all_sections(spec) if isinstance(s, dict)}
     if "menu" in kinds:
         return "restaurant"
-    section_count = len(spec.get("sections") or [])
-    if section_count <= 3 and "hero" in kinds:
+    page_count = len(spec.get("pages") or []) or len(_all_sections(spec))
+    if page_count <= 1 and "hero" in kinds:
         return "landing"
     return "business"
+
+
+def _enrich_section(section: dict, spec: dict) -> dict:
+    kind = section.get("kind", "")
+    content = dict(section.get("content") or {})
+    if kind == "hero" and not content.get("headline"):
+        content["headline"] = spec.get("site_name")
+        content["subheadline"] = spec.get("tagline")
+        content.setdefault("cta", "Get in touch")
+    if kind == "services" and not content.get("items"):
+        content["items"] = [
+            {"title": "Consulting", "description": "Expert guidance tailored to your goals."},
+            {"title": "Implementation", "description": "Reliable delivery from plan to launch."},
+            {"title": "Support", "description": "Ongoing help after go-live."},
+        ]
+    return {"kind": kind, "content": content}
 
 
 def _default_enrich(spec: dict) -> dict:
     """Offline fallback when Claude is unavailable."""
     enriched = {**spec}
     enriched["template"] = pick_template(spec)
-    sections = []
-    for section in spec.get("sections") or []:
-        kind = section.get("kind", "")
-        content = dict(section.get("content") or {})
-        if kind == "hero" and not content.get("headline"):
-            content["headline"] = spec.get("site_name")
-            content["subheadline"] = spec.get("tagline")
-            content.setdefault("cta", "Get in touch")
-        if kind == "services" and not content.get("items"):
-            content["items"] = [
-                {"title": "Consulting", "description": "Expert guidance tailored to your goals."},
-                {"title": "Implementation", "description": "Reliable delivery from plan to launch."},
-                {"title": "Support", "description": "Ongoing help after go-live."},
-            ]
-        sections.append({"kind": kind, "content": content})
+
+    pages = spec.get("pages")
+    if isinstance(pages, list) and pages:
+        enriched_pages = []
+        for page in pages:
+            if not isinstance(page, dict):
+                continue
+            enriched_pages.append({
+                **page,
+                "sections": [
+                    _enrich_section(s, spec)
+                    for s in (page.get("sections") or [])
+                    if isinstance(s, dict)
+                ],
+            })
+        enriched["pages"] = enriched_pages
+        return enriched
+
+    sections = [
+        _enrich_section(s, spec)
+        for s in (spec.get("sections") or [])
+        if isinstance(s, dict)
+    ]
     enriched["sections"] = sections
     return enriched
 
@@ -65,7 +100,7 @@ async def generate_site_spec(spec: dict) -> dict:
     user = json.dumps({"build_spec": spec})
     raw = await call_claude(system, user)
     parsed = _parse_json_response(raw)
-    if parsed and isinstance(parsed, dict) and parsed.get("sections"):
+    if parsed and isinstance(parsed, dict) and (parsed.get("sections") or parsed.get("pages")):
         parsed["template"] = pick_template(parsed)
         return parsed
     return _default_enrich(spec)

@@ -1,6 +1,11 @@
 import { redirect } from "next/navigation";
 import type { UserRole, UserRow } from "@gigster/shared-types";
 import { createClient } from "@/lib/supabase/server";
+import {
+  expireStaleMembership,
+  getUserSubscription,
+  membershipIsLive,
+} from "@/lib/subscription";
 
 /** The authenticated profile, or null if signed out. */
 export async function getCurrentUser(): Promise<UserRow | null> {
@@ -37,5 +42,13 @@ export async function requireRole(...roles: UserRole[]): Promise<UserRow> {
 export async function requireActive(): Promise<UserRow> {
   const user = await requireUser();
   if (user.status !== "active") redirect("/buy");
-  return user;
+
+  await expireStaleMembership(user.id);
+  const refreshed = await getCurrentUser();
+  if (!refreshed || refreshed.status !== "active") redirect("/buy");
+
+  const sub = await getUserSubscription(refreshed.id);
+  if (!membershipIsLive(refreshed, sub)) redirect("/buy");
+
+  return refreshed;
 }

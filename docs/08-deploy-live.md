@@ -27,6 +27,8 @@ Add for **Production** (copy values from `apps/web/.env.local`):
 | `SUPABASE_SERVICE_ROLE_KEY` | service_role (Production only, secret) |
 | `GIGSTER_API_URL` | Railway backend URL — see section 9 (**not** gigster.website) |
 | `GIGSTER_USDT_TRC20_ADDRESS` | your USDT TRC-20 wallet |
+| `RESEND_API_KEY` | Resend API key (activation + marketer emails from admin) |
+| `RESEND_FROM` | e.g. `Gigster <noreply@gigster.website>` |
 | `NEXT_PUBLIC_DESKTOP_DOWNLOAD_URL` | optional — direct link to Windows `.exe` |
 | `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | optional — bot username without `@` |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | optional — Cloudflare Turnstile |
@@ -81,7 +83,20 @@ ANTHROPIC_API_KEY=...
 CORS_ORIGINS=https://www.gigster.website,https://gigster.website
 TELEGRAM_BOT_TOKEN=...
 TELEGRAM_WEBHOOK_SECRET=...   (or reuse CRON_SECRET)
+RESEND_API_KEY=...
+RESEND_FROM=Gigster <noreply@gigster.website>
+SITE_URL=https://www.gigster.website
+CRON_SECRET=...               (same secret for all cron + Telegram webhook path)
 ```
+
+**Scheduled cron jobs** (Railway cron or external scheduler — daily, header `X-Cron-Secret: $CRON_SECRET`):
+
+| POST endpoint | Purpose |
+|---------------|---------|
+| `/cron/subscriptions/expire` | Deactivate memberships past `expires_at` |
+| `/cron/subscriptions/warn-expiry` | Email “expires in 3 days” warning |
+| `/cron/referrals/qualify` | 90-day referral qualification |
+| `/cron/referrals/churn` | Churn clawback for marketers |
 
 4. **Networking → Generate Domain** → copy URL, e.g.  
    `https://gigster-production-a1b2.up.railway.app`

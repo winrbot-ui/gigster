@@ -9,6 +9,10 @@ import {
 } from "@gigster/shared-types";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireRole } from "@/lib/auth";
+import {
+  sendMarketerApprovedEmail,
+  sendMembershipActivatedEmail,
+} from "@/lib/email";
 
 export type AdminActionState = { error?: string; success?: string };
 
@@ -73,6 +77,18 @@ async function verifyPayment(
     .update({ status: "active" })
     .eq("id", payment.user_id);
 
+  const { data: activatedUser } = await admin
+    .from("users")
+    .select("email, username")
+    .eq("id", payment.user_id)
+    .single();
+  if (activatedUser?.email) {
+    await sendMembershipActivatedEmail(
+      activatedUser.email,
+      activatedUser.username ?? "",
+    );
+  }
+
   revalidatePath("/admin");
   return { success: "Payment verified. User activated." };
 }
@@ -124,6 +140,18 @@ export async function approveMarketerApplication(
       milestone_40_paid: false,
       salary_active: false,
     });
+
+    const { data: marketerUser } = await admin
+      .from("users")
+      .select("email, username")
+      .eq("id", userId)
+      .single();
+    if (marketerUser?.email) {
+      await sendMarketerApprovedEmail(
+        marketerUser.email,
+        marketerUser.username ?? "",
+      );
+    }
   }
 
   revalidatePath("/admin");

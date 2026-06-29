@@ -92,18 +92,54 @@ def _mock_draft(persona: dict, project_json: dict, ocr_text: str) -> str:
 
 def _mock_brief(project_json: dict, slug: str | None) -> dict:
     client = project_json.get("client_name") or "Client"
+    preview = slug or client.lower().replace(" ", "-")
     return {
         "template": "business",
         "site_name": client,
         "tagline": project_json.get("summary") or "Professional services",
-        "sections": [
-            {"kind": "hero", "content": {"headline": client, "cta": "Contact Us"}},
-            {"kind": "services", "content": {"items_count": 3}},
-            {"kind": "contact_form", "content": {"fields": ["name", "email", "message"]}},
+        "pages": [
+            {
+                "slug": "home",
+                "title": "Home",
+                "sections": [
+                    {"kind": "hero", "content": {"headline": client, "cta": "Contact Us"}},
+                    {"kind": "services", "content": {"items_count": 3}},
+                    {"kind": "cta", "content": {"headline": "Ready to get started?"}},
+                ],
+            },
+            {
+                "slug": "about",
+                "title": "About",
+                "sections": [
+                    {"kind": "about_story", "content": {"text": "Our story."}},
+                    {"kind": "team", "content": {"members_count": 2}},
+                ],
+            },
+            {
+                "slug": "services",
+                "title": "Services",
+                "sections": [{"kind": "services", "content": {"items_count": 4}}],
+            },
+            {
+                "slug": "contact",
+                "title": "Contact",
+                "sections": [
+                    {
+                        "kind": "contact_form",
+                        "content": {"fields": ["name", "email", "message"]},
+                    },
+                    {"kind": "embed", "content": {"service": "google_maps"}},
+                ],
+            },
+            {
+                "slug": "faq",
+                "title": "FAQ",
+                "sections": [{"kind": "faq", "content": {"items": []}}],
+            },
         ],
         "theme": {"primary": "#003366", "accent": "#c8a86a", "dark": True},
         "contact": {"email": None, "phone": None, "address": None},
-        "_preview_slug": slug or client.lower().replace(" ", "-"),
+        "_preview_slug": preview,
     }
 
 

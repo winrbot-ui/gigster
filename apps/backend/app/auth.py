@@ -5,6 +5,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import jwt, JWTError
 from app.config import settings
 from app.db import get_supabase_optional
+from app.services.subscriptions import subscription_is_live
 
 security = HTTPBearer(auto_error=False)
 
@@ -44,4 +45,21 @@ async def require_active_user(user_id: str = Depends(get_current_user_id)) -> st
     row = sb.table("users").select("status").eq("id", user_id).single().execute()
     if not row.data or row.data.get("status") != "active":
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Active subscription required")
+
+    sub = (
+        sb.table("subscriptions")
+        .select("active, expires_at")
+        .eq("user_id", user_id)
+        .eq("active", True)
+        .order("expires_at", desc=True)
+        .limit(1)
+        .maybe_single()
+        .execute()
+    )
+    if not subscription_is_live(sub.data):
+        sb.table("subscriptions").update({"active": False}).eq("user_id", user_id).eq(
+            "active", True
+        ).execute()
+        sb.table("users").update({"status": "expired"}).eq("id", user_id).execute()
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Subscription expired")
     return user_id

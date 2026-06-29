@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
-export function ApplyMarketerForm() {
+export function ApplyMarketerForm({ email }: { email: string }) {
   const [state, formAction, pending] = useActionState<
     MarketerActionState,
     FormData
@@ -34,8 +34,8 @@ export function ApplyMarketerForm() {
             <Input id="full_name" name="full_name" required />
           </div>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" name="email" type="email" required />
+            <Label htmlFor="email">Account email</Label>
+            <Input id="email" name="email" type="email" value={email} readOnly disabled />
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="country">Country</Label>

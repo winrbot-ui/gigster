@@ -2,6 +2,9 @@ const $ = (id) => document.getElementById(id);
 
 const apiUrlEl = $("api-url");
 const jwtEl = $("jwt");
+const refreshEl = $("refresh-token");
+const supabaseUrlEl = $("supabase-url");
+const supabaseAnonEl = $("supabase-anon");
 const projectIdEl = $("project-id");
 const platformEl = $("platform");
 const clientNameEl = $("client-name");
@@ -29,6 +32,9 @@ function loadLocalConfig() {
     const cfg = JSON.parse(raw);
     apiUrlEl.value = cfg.apiUrl || "";
     jwtEl.value = cfg.jwt || "";
+    refreshEl.value = cfg.refreshToken || "";
+    supabaseUrlEl.value = cfg.supabaseUrl || "";
+    supabaseAnonEl.value = cfg.supabaseAnonKey || "";
     projectIdEl.value = cfg.projectId || "";
     platformEl.value = cfg.platform || "upwork";
     clientNameEl.value = cfg.clientName || "";
@@ -43,6 +49,9 @@ function saveLocalConfig() {
     JSON.stringify({
       apiUrl: apiUrlEl.value,
       jwt: jwtEl.value,
+      refreshToken: refreshEl.value,
+      supabaseUrl: supabaseUrlEl.value,
+      supabaseAnonKey: supabaseAnonEl.value,
       projectId: projectIdEl.value,
       platform: platformEl.value,
       clientName: clientNameEl.value,
@@ -55,6 +64,9 @@ async function syncConfigToRust() {
   const msg = await invoke("set_config", {
     apiUrl: apiUrlEl.value.trim() || "http://localhost:8000",
     jwtToken: jwtEl.value.trim(),
+    refreshToken: refreshEl.value.trim(),
+    supabaseUrl: supabaseUrlEl.value.trim(),
+    supabaseAnonKey: supabaseAnonEl.value.trim(),
     projectId: projectIdEl.value.trim(),
     platform: platformEl.value,
     clientName: clientNameEl.value.trim() || "Client",

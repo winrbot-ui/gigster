@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buttonClasses } from "@/components/ui/button";
+import { DesktopCredentials } from "@/components/app/desktop-credentials";
+import { publicEnv } from "@/lib/env";
 
 export const metadata: Metadata = {
   title: "Desktop app",
@@ -20,6 +22,12 @@ export const metadata: Metadata = {
 export default async function DesktopPage() {
   const user = await requireActive();
   const supabase = await createClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const accessToken = session?.access_token ?? "";
+  const refreshToken = session?.refresh_token ?? "";
+  const apiUrl = process.env.GIGSTER_API_URL?.trim() ?? "";
   const { data: sub } = await supabase
     .from("subscriptions")
     .select("plan, platforms_allowed, expires_at, active")
@@ -70,7 +78,7 @@ export default async function DesktopPage() {
                   Download Gigster for Windows
                 </a>
                 <p className="text-muted">
-                  After install, sign in with the same @nickname and password as this website.
+                  After install, open the app and paste the connection values from below (API URL, tokens, Supabase).
                 </p>
               </>
             ) : (
@@ -90,6 +98,24 @@ export default async function DesktopPage() {
           </CardContent>
         </Card>
 
+        <Card>
+          <CardHeader>
+            <CardTitle>Connect the app</CardTitle>
+            <CardDescription>
+              Paste these into the desktop app to authenticate. Do not share your access token.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DesktopCredentials
+              apiUrl={apiUrl}
+              accessToken={accessToken}
+              refreshToken={refreshToken}
+              supabaseUrl={publicEnv.supabaseUrl}
+              supabaseAnonKey={publicEnv.supabaseAnonKey}
+            />
+          </CardContent>
+        </Card>
+
         <div className="grid gap-6 lg:grid-cols-2">
           <Card>
             <CardHeader>
@@ -99,7 +125,7 @@ export default async function DesktopPage() {
               <p>1. Complete <Link href="/agent-setup" className="text-accent-strong hover:underline">Agent setup</Link> (persona).</p>
               <p>2. Open Chrome — one profile per platform ({platforms} allowed on your plan).</p>
               <p>3. Keep the platform <strong className="text-foreground">Messages</strong> tab open.</p>
-              <p>4. Install Desktop app → sign in with the same @nickname + password as the website.</p>
+              <p>4. Install Desktop app → paste connection values from below (tokens refresh automatically).</p>
               <p>5. Link Telegram (code below) for message alarms.</p>
             </CardContent>
           </Card>

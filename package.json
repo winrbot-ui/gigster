@@ -17,6 +17,8 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "db:migrate": "node infra/supabase/apply-migrations.mjs",
     "db:seed": "node scripts/seed-dev-users.mjs",
+    "db:create-pending": "node scripts/create-pending-member.mjs",
+    "db:clear-limits": "node scripts/clear-rate-limits.mjs",
     "desktop:activate": "node scripts/desktop-activate.mjs",
     "db:verify": "node scripts/verify-supabase-env.mjs"
   }

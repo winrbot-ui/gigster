@@ -29,6 +29,9 @@ struct MonitorState {
 struct AppConfig {
     api_url: String,
     jwt_token: String,
+    refresh_token: String,
+    supabase_url: String,
+    supabase_anon_key: String,
     project_id: String,
     platform: String,
     client_name: String,
@@ -45,13 +48,112 @@ fn hash_text(s: &str) -> u64 {
     s.bytes().fold(0u64, |acc, b| acc.wrapping_mul(31).wrapping_add(b as u64))
 }
 
+fn jwt_exp_unix(token: &str) -> Option<u64> {
+    let payload = token.split('.').nth(1)?;
+    let padded = match payload.len() % 4 {
+        2 => format!("{payload}=="),
+        3 => format!("{payload}="),
+        _ => payload.to_string(),
+    };
+    let decoded = base64_decode(&padded)?;
+    let v: serde_json::Value = serde_json::from_str(&decoded).ok()?;
+    v.get("exp")?.as_u64()
+}
+
+fn base64_decode(input: &str) -> Option<String> {
+    const TABLE: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    let mut out = Vec::new();
+    let mut buf = 0u32;
+    let mut bits = 0u32;
+    for ch in input.chars() {
+        if ch == '=' {
+            break;
+        }
+        let val = TABLE.iter().position(|&b| b == ch as u8)? as u32;
+        buf = (buf << 6) | val;
+        bits += 6;
+        if bits >= 8 {
+            bits -= 8;
+            out.push((buf >> bits) as u8);
+            buf &= (1 << bits) - 1;
+        }
+    }
+    String::from_utf8(out).ok()
+}
+
+fn token_needs_refresh(token: &str, leeway_secs: u64) -> bool {
+    match jwt_exp_unix(token) {
+        Some(exp) => {
+            let now = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_secs();
+            exp <= now.saturating_add(leeway_secs)
+        }
+        None => true,
+    }
+}
+
+fn refresh_access_token(config: &mut AppConfig) -> Result<(), String> {
+    if config.refresh_token.is_empty()
+        || config.supabase_url.is_empty()
+        || config.supabase_anon_key.is_empty()
+    {
+        return Ok(());
+    }
+    if !token_needs_refresh(&config.jwt_token, 300) {
+        return Ok(());
+    }
+
+    let client = reqwest::blocking::Client::builder()
+        .timeout(Duration::from_secs(15))
+        .build()
+        .map_err(|e| e.to_string())?;
+    let url = format!(
+        "{}/auth/v1/token?grant_type=refresh_token",
+        config.supabase_url.trim_end_matches('/')
+    );
+    let resp = client
+        .post(&url)
+        .header("apikey", &config.supabase_anon_key)
+        .header("Authorization", format!("Bearer {}", config.supabase_anon_key))
+        .header("Content-Type", "application/json")
+        .json(&serde_json::json!({
+            "refresh_token": config.refresh_token,
+        }))
+        .send()
+        .map_err(|e| e.to_string())?;
+
+    if !resp.status().is_success() {
+        return Err(format!("Token refresh failed: HTTP {}", resp.status()));
+    }
+
+    let body: serde_json::Value = resp.json().map_err(|e| e.to_string())?;
+    let access = body
+        .get("access_token")
+        .and_then(|v| v.as_str())
+        .ok_or_else(|| "Refresh response missing access_token".to_string())?;
+    config.jwt_token = access.to_string();
+    if let Some(rt) = body.get("refresh_token").and_then(|v| v.as_str()) {
+        config.refresh_token = rt.to_string();
+    }
+    Ok(())
+}
+
+fn ensure_fresh_token(config: &mut AppConfig) -> Result<(), String> {
+    refresh_access_token(config)
+}
+
 fn random_delay_minutes() -> u64 {
     rand::thread_rng().gen_range(MIN_DELAY_MIN..=MAX_DELAY_MIN)
 }
 
-fn post_notification(config: &AppConfig, platform: &str, client_name: &str, mode: &str) -> String {
+fn post_notification(config: &mut AppConfig, platform: &str, client_name: &str, mode: &str) -> String {
     if config.api_url.is_empty() || config.jwt_token.is_empty() {
         return "Skipped notification — set API URL and JWT".into();
+    }
+    if let Err(e) = ensure_fresh_token(config) {
+        return format!("Token refresh failed: {e}");
     }
     let client = match reqwest::blocking::Client::builder()
         .timeout(Duration::from_secs(15))
@@ -81,10 +183,11 @@ fn post_notification(config: &AppConfig, platform: &str, client_name: &str, mode
     }
 }
 
-fn sync_auto_settings(config: &AppConfig, enabled: bool, disclaimer: bool, delay: u64) {
+fn sync_auto_settings(config: &mut AppConfig, enabled: bool, disclaimer: bool, delay: u64) {
     if config.api_url.is_empty() || config.jwt_token.is_empty() {
         return;
     }
+    let _ = ensure_fresh_token(config);
     let client = match reqwest::blocking::Client::builder()
         .timeout(Duration::from_secs(10))
         .build()
@@ -107,7 +210,7 @@ fn sync_auto_settings(config: &AppConfig, enabled: bool, disclaimer: bool, delay
 }
 
 fn fetch_draft(
-    config: &AppConfig,
+    config: &mut AppConfig,
     ocr_text: &str,
     mode: &str,
     delay_min: u64,
@@ -115,6 +218,7 @@ fn fetch_draft(
     if config.api_url.is_empty() || config.jwt_token.is_empty() {
         return Err("Set API URL and JWT token first".into());
     }
+    ensure_fresh_token(config)?;
     let client = reqwest::blocking::Client::builder()
         .timeout(Duration::from_secs(60))
         .build()
@@ -141,14 +245,16 @@ fn fetch_draft(
 
 fn handle_new_message(
     state: Arc<AppState>,
-    config: AppConfig,
     platform: String,
     client_name: String,
     thread_text: String,
     auto_mode: bool,
 ) {
     let mode = if auto_mode { "auto" } else { "manual" };
-    let event_msg = post_notification(&config, &platform, &client_name, mode);
+    let event_msg = {
+        let mut cfg = state.config.lock().unwrap();
+        post_notification(&mut cfg, &platform, &client_name, mode)
+    };
 
     let _ = rpa::open_latest_thread(&platform);
 
@@ -165,7 +271,12 @@ fn handle_new_message(
         }
     }
 
-    match fetch_draft(&config, &thread_text, mode, delay_min) {
+    let draft_result = {
+        let mut cfg = state.config.lock().unwrap();
+        fetch_draft(&mut cfg, &thread_text, mode, delay_min)
+    };
+
+    match draft_result {
         Ok(data) => {
             let draft = data
                 .get("draft")
@@ -305,10 +416,8 @@ fn run_monitor_loop(state: Arc<AppState>) {
             };
 
             if is_new {
-                let config = state.config.lock().unwrap().clone();
                 handle_new_message(
                     state.clone(),
-                    config,
                     detected_platform,
                     client_name,
                     ocr_text,
@@ -335,6 +444,9 @@ fn get_config(state: State<'_, Arc<AppState>>) -> AppConfig {
 fn set_config(
     api_url: String,
     jwt_token: String,
+    refresh_token: String,
+    supabase_url: String,
+    supabase_anon_key: String,
     project_id: String,
     platform: String,
     client_name: String,
@@ -344,6 +456,9 @@ fn set_config(
     *config = AppConfig {
         api_url,
         jwt_token,
+        refresh_token,
+        supabase_url,
+        supabase_anon_key,
         project_id,
         platform,
         client_name,
@@ -370,9 +485,9 @@ fn start_tab_monitor(
         .unwrap_or(15)
         .clamp(MIN_DELAY_MIN, MAX_DELAY_MIN);
 
-    let config = state.config.lock().unwrap().clone();
     if auto_mode {
-        sync_auto_settings(&config, true, true, delay);
+        let mut cfg = state.config.lock().unwrap();
+        sync_auto_settings(&mut cfg, true, true, delay);
     }
 
     let mut monitor = state.monitor.lock().unwrap();
@@ -382,14 +497,14 @@ fn start_tab_monitor(
     monitor.delay_minutes = delay;
 
     Ok(if auto_mode {
+        let platform = state.config.lock().unwrap().platform.clone();
         format!(
             "Auto: watches {platform} tab · reads new messages · replies · leaves after 2 min if no answer",
-            platform = config.platform
         )
     } else {
+        let platform = state.config.lock().unwrap().platform.clone();
         format!(
             "Manual: watches {platform} tab · reads messages · draft appears here for you to send",
-            platform = config.platform
         )
     })
 }

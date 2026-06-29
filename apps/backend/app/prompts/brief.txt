@@ -1,3 +1,14 @@
 Generate a build_spec JSON for Agent 2 from confirmed project_json.
 Use section kinds: hero, services, about_story, team, contact_form, cta, faq, pricing, gallery, testimonials, menu, embed, blog_list.
-Template: business, landing, or restaurant. Return JSON only.
+Template: business, landing, or restaurant.
+
+For business sites, prefer a multi-page structure with a "pages" array (3-7 pages):
+- home (hero, services, cta)
+- about (about_story, team)
+- services (services)
+- contact (contact_form, embed)
+- optional faq or blog_list
+
+Each page: { "slug", "title", "sections": [{ "kind", "content" }] }.
+Also include site_name, tagline, theme, contact.
+Return JSON only.

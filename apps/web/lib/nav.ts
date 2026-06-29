@@ -15,12 +15,12 @@ export function buildMemberNav(user: UserRow): NavItem[] {
     nav.push({ href: "/buy", label: "Membership" });
   }
 
-  if (user.role === "admin") {
-    nav.push({ href: "/admin", label: "Admin panel" });
+  if (user.role === "marketer") {
+    nav.push({ href: "/marketer", label: "Marketer" });
   }
 
-  if (user.role === "marketer" || user.role === "admin") {
-    nav.push({ href: "/marketer", label: "Marketer" });
+  if (user.role === "admin") {
+    nav.push({ href: "/admin", label: "Admin panel" });
   }
 
   return nav;

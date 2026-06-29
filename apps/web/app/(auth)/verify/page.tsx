@@ -15,7 +15,10 @@ export default async function VerifyPage({
   const params = await searchParams;
   const user = await getCurrentUser();
 
-  if (user?.status === "pending_payment" || user?.status === "active") {
+  if (user?.status === "active") {
+    redirect("/dashboard");
+  }
+  if (user?.status === "pending_payment") {
     redirect("/buy");
   }
 

@@ -276,9 +276,42 @@ export async function requestPasswordReset(
   if (!email) return { error: "Enter your account email." };
 
   const supabase = await createClient();
+  // The recovery link must pass through /auth/callback so the recovery code is
+  // exchanged for a session before the user lands on the reset form.
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${getSiteUrl()}/settings?reset=1`,
+    redirectTo: `${getSiteUrl()}/auth/callback?next=/reset-password`,
   });
   if (error) return { error: error.message };
   return { success: "Password reset link sent to your email." };
+}
+
+/**
+ * Completes a password reset. The user arrives here with a Supabase recovery
+ * session (already authenticated), so no current password is required.
+ */
+export async function completePasswordReset(
+  _prev: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  const next = String(formData.get("new_password") ?? "");
+  const confirm = String(formData.get("confirm_password") ?? "");
+
+  if (next.length < 8) {
+    return { error: "New password must be at least 8 characters." };
+  }
+  if (next !== confirm) return { error: "Passwords do not match." };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return {
+      error: "Reset link expired or invalid. Request a new password reset email.",
+    };
+  }
+
+  const { error } = await supabase.auth.updateUser({ password: next });
+  if (error) return { error: error.message };
+  redirect("/dashboard");
 }

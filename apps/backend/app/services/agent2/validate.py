@@ -11,7 +11,6 @@ SECTION_KINDS = frozenset({
 
 BUILD_TEMPLATES = frozenset({"business", "landing", "restaurant"})
 
-# Capability blockers — features Agent 2 cannot build.
 BLOCKER_PATTERNS = [
     re.compile(p, re.I)
     for p in (
@@ -32,12 +31,41 @@ BLOCKER_PATTERNS = [
 ]
 
 
+def _validate_sections(sections: list, label: str) -> tuple[bool, str]:
+    if not isinstance(sections, list) or not sections:
+        return False, f"No sections on {label}"
+    for i, section in enumerate(sections):
+        if not isinstance(section, dict):
+            return False, f"Section {i} on {label} must be an object"
+        kind = section.get("kind")
+        if kind not in SECTION_KINDS:
+            return False, f"Invalid section kind on {label}: {kind!r}"
+        if "content" not in section:
+            return False, f"Section {i} on {label} missing content"
+    return True, "ok"
+
+
+def _iter_sections(spec: dict) -> list[dict]:
+    pages = spec.get("pages")
+    if isinstance(pages, list) and pages:
+        out: list[dict] = []
+        for page in pages:
+            if isinstance(page, dict):
+                out.extend(page.get("sections") or [])
+        return out
+    return spec.get("sections") or []
+
+
 def _collect_text(spec: dict) -> str:
     parts: list[str] = [
         str(spec.get("site_name") or ""),
         str(spec.get("tagline") or ""),
     ]
-    for section in spec.get("sections") or []:
+    for page in spec.get("pages") or []:
+        if isinstance(page, dict):
+            parts.append(str(page.get("title") or ""))
+            parts.append(str(page.get("slug") or ""))
+    for section in _iter_sections(spec):
         if isinstance(section, dict):
             parts.append(str(section.get("kind") or ""))
             content = section.get("content")
@@ -68,18 +96,21 @@ def validate_build_spec(spec: dict) -> tuple[bool, str]:
     if not site_name or not str(site_name).strip():
         return False, "Missing site_name"
 
-    sections = spec.get("sections")
-    if not isinstance(sections, list) or not sections:
-        return False, "No sections"
-
-    for i, section in enumerate(sections):
-        if not isinstance(section, dict):
-            return False, f"Section {i} must be an object"
-        kind = section.get("kind")
-        if kind not in SECTION_KINDS:
-            return False, f"Invalid section kind: {kind!r}"
-        if "content" not in section:
-            return False, f"Section {i} missing content"
+    pages = spec.get("pages")
+    if isinstance(pages, list) and pages:
+        for i, page in enumerate(pages):
+            if not isinstance(page, dict):
+                return False, f"Page {i} must be an object"
+            slug = page.get("slug")
+            if not slug or not str(slug).strip():
+                return False, f"Page {i} missing slug"
+            ok, reason = _validate_sections(page.get("sections") or [], f"page {slug}")
+            if not ok:
+                return False, reason
+    else:
+        ok, reason = _validate_sections(spec.get("sections") or [], "site")
+        if not ok:
+            return False, reason
 
     theme = spec.get("theme")
     if theme is not None and not isinstance(theme, dict):

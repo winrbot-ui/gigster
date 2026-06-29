@@ -31,12 +31,20 @@ export interface BuildSection {
   content: Record<string, unknown>;
 }
 
+export interface BuildPage {
+  slug: string;
+  title: string;
+  sections: BuildSection[];
+}
+
 export interface BuildSpec {
   template: BuildTemplate;
   site_name: string;
   tagline: string | null;
-  /** Ordered list of sections to render. */
-  sections: BuildSection[];
+  /** Multi-page sites (preferred for business template). */
+  pages?: BuildPage[];
+  /** Legacy single-page layout when `pages` is omitted. */
+  sections?: BuildSection[];
   /** Brand palette / theme hints. */
   theme: {
     primary: string | null;
