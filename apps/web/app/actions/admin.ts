@@ -314,11 +314,15 @@ export async function getAdminStats() {
 export async function getPendingPayments() {
   await requireRole("admin");
   const admin = createAdminClient();
-  const { data } = await admin
+  const { data, error } = await admin
     .from("payments")
-    .select("*, users(email, username)")
+    .select("*, users!payments_user_id_fkey(email, username)")
     .eq("status", "submitted")
-    .order("paid_at", { ascending: true });
+    .order("id", { ascending: true });
+  if (error) {
+    console.error("getPendingPayments:", error.message);
+    return [];
+  }
   return data ?? [];
 }
 
