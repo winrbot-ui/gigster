@@ -104,7 +104,7 @@ async function ensureUser(admin, spec) {
     never_say: ["As an AI", "I'm a bot"],
     always_do: "Client first name, 2-5 sentences, max 2 questions",
     experience_years: 6,
-    location: "CET",
+    location: "US / Eastern",
     updated_at: now,
   });
 

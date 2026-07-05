@@ -55,7 +55,7 @@ export function JoinForm({ initialNickname = "", turnstileSiteKey }: JoinFormPro
                 id="nickname"
                 name="nickname"
                 defaultValue={initialNickname}
-                placeholder="marko"
+                placeholder="jordan"
                 autoComplete="off"
                 spellCheck={false}
                 required

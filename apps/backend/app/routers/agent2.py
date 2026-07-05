@@ -3,7 +3,7 @@ from __future__ import annotations
 from pydantic import BaseModel
 from fastapi import APIRouter, Depends, HTTPException
 from app.auth import require_active_user
-from app.services.agent2.worker import run_agent2
+from app.services.agent2.jobs import enqueue_agent2
 from app.db import get_supabase_optional
 
 router = APIRouter(prefix="/agent2", tags=["agent2"])
@@ -33,7 +33,7 @@ async def retry_build(
     if not proj.data:
         raise HTTPException(404, "Project not found")
 
-    result = await run_agent2(body.project_id)
+    result = await enqueue_agent2(body.project_id)
     if not result.get("ok"):
         raise HTTPException(500, result.get("error", "Agent 2 failed"))
     return result

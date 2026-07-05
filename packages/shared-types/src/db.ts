@@ -98,6 +98,8 @@ export interface ProjectRow {
   user_id: string;
   platform: ProjectPlatform;
   client_name: string | null;
+  /** Marketplace thread/conversation id from the extension. */
+  thread_id: string | null;
   status: ProjectStatus;
   project_json: ProjectJson | null;
   build_spec: BuildSpec | null;
@@ -105,6 +107,19 @@ export interface ProjectRow {
   agent2_status: Agent2Status;
   preview_url: string | null;
   preview_slug: string | null;
+  created_at: string;
+}
+
+export type MessageRole = "client" | "assistant";
+
+export interface ConversationMessageRow {
+  id: string;
+  user_id: string;
+  platform: ProjectPlatform;
+  thread_id: string;
+  role: MessageRole;
+  text: string;
+  sent_at: string | null;
   created_at: string;
 }
 

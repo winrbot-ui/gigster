@@ -81,7 +81,7 @@ export function ProjectMemory({ projectJson }: ProjectMemoryProps) {
   if (!projectJson) {
     return (
       <p className="text-sm text-muted">
-        No conversation memory yet. Use the desktop app or Generate to extract from messages.
+        No conversation memory yet. Use Generate to extract from messages.
       </p>
     );
   }

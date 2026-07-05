@@ -9,7 +9,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 This repo is **Gigster** (closed-club SaaS: AI persona drafts client replies,
 Agent 2 builds preview sites). It is an npm-workspaces monorepo
-(`apps/web`, `apps/backend`, `apps/desktop`, `packages/shared-types`,
+(`apps/web`, `apps/backend`, `packages/shared-types`,
 `infra/supabase`).
 
 Before writing code, read the canonical docs in `docs/`:
@@ -25,6 +25,6 @@ Before writing code, read the canonical docs in `docs/`:
 
 Rules:
 - Import shared schema types from `@gigster/shared-types`; never redefine them.
-- AI prompts/persona logic live **only** on the backend, never in web/desktop.
+- AI prompts/persona logic live **only** on the backend, never in the web client.
 - Keep `docs/` and `packages/shared-types` in sync with code in the same PR.
 <!-- END:gigster-project -->

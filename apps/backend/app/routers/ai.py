@@ -1,18 +1,19 @@
 from __future__ import annotations
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from fastapi import APIRouter, Depends, HTTPException
 from app.auth import require_active_user
 from app.db import get_supabase_optional
 from app.services.ai import pipeline as ai
-from app.services.agent2.worker import run_agent2
+from app.services.agent2.jobs import enqueue_agent2
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 
 
 class GenerateRequest(BaseModel):
     project_id: str
-    ocr_text: str = ""
+    inbox_text: str = ""
+    ocr_text: str = ""  # backward compat alias
 
 
 class BriefRequest(BaseModel):
@@ -24,6 +25,10 @@ class ScoreRequest(BaseModel):
     project_json: dict | None = None
 
 
+def _resolve_inbox_text(body: GenerateRequest) -> str:
+    return (body.inbox_text or body.ocr_text or "").strip()
+
+
 @router.post("/generate")
 async def generate_draft(
     body: GenerateRequest,
@@ -33,6 +38,7 @@ async def generate_draft(
     if not sb:
         raise HTTPException(503, "Database not configured")
 
+    inbox_text = _resolve_inbox_text(body)
     proj = (
         sb.table("projects")
         .select("*")
@@ -48,10 +54,11 @@ async def generate_draft(
         sb.table("agent_personas").select("*").eq("user_id", user_id).maybe_single().execute()
     )
     existing = proj.data.get("project_json") or {}
-    updated = await ai.extract(body.ocr_text, existing)
+    updated, _ = await ai.extract(inbox_text, existing)
     score = ai.compute_brief_score(updated)
-    stage = await ai.detect_stage(body.ocr_text)
-    draft_text = await ai.draft(persona_row.data or {}, updated, body.ocr_text)
+    stage = await ai.detect_stage(inbox_text)
+    updated = ai.apply_stage_to_project(updated, stage)
+    draft_text, _ = await ai.draft(persona_row.data or {}, updated, inbox_text)
     readiness = ai.brief_readiness_details(updated, score)
 
     new_status = updated.get("status") or proj.data.get("status")
@@ -129,10 +136,14 @@ async def generate_brief(
         raise HTTPException(400, f"Brief not ready: missing {', '.join(readiness['missing'])}")
 
     build_spec = await ai.brief(pj, proj.data.get("preview_slug"))
-    sb.table("projects").update({"build_spec": build_spec}).eq("id", body.project_id).execute()
+    pj_with_decision = {**pj, "brief_decision": "build"}
+    sb.table("projects").update(
+        {"build_spec": build_spec, "project_json": pj_with_decision}
+    ).eq("id", body.project_id).execute()
 
-    result = await run_agent2(body.project_id)
-    if not result.get("ok"):
-        raise HTTPException(500, result.get("error", "Agent 2 failed"))
-
-    return {"build_spec": build_spec, "preview_url": result.get("preview_url")}
+    result = await enqueue_agent2(body.project_id)
+    return {
+        "build_spec": build_spec,
+        "agent2": result,
+        "status": result.get("status", "building"),
+    }

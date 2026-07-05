@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException
 from app.config import settings
 from app.services.referrals import run_referral_churn_clawback, run_referral_qualification
 from app.services.subscriptions import run_expiry_warnings, run_subscription_expiry
-from app.services.agent2.worker import run_agent2
+from app.services.agent2.jobs import enqueue_agent2
 
 router = APIRouter(prefix="/cron", tags=["cron"])
 
@@ -50,4 +50,4 @@ async def retry_agent2(
 ):
     """Service/cron retry for failed Agent 2 builds."""
     _verify_cron(x_cron_secret)
-    return await run_agent2(body.project_id)
+    return await enqueue_agent2(body.project_id)

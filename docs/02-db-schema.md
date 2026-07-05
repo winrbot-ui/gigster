@@ -23,10 +23,11 @@ table. The matching TypeScript types live in `packages/shared-types`.
 | `user_status` | `pending_email`, `pending_payment`, `active`, `expired`, `blocked` |
 | `plan` | `basic`, `pro` |
 | `payment_status` | `submitted`, `verified`, `rejected` |
-| `project_platform` | `upwork`, `fiverr`, `freelancer` |
+| `project_platform` | `upwork`, `fiverr`, `freelancer` (Upwork enum value exists but is `coming_soon` — no new projects) |
 | `project_status` | `new`, `negotiating`, `deal`, `done` |
 | `agent2_status` | `idle`, `building`, `ready`, `failed` |
 | `referral_status` | `pending`, `qualified`, `churned` |
+| `message_role` | `client`, `assistant` |
 
 ## Tables
 
@@ -70,12 +71,12 @@ Tier mapping: 20 qualified → €10k (`milestone_20_paid`); 40 qualified → �
 `qualified_count` and reverts tiers via cron.
 
 ### `desktop_auto_settings`
-`user_id` PK FK→users · `enabled` bool · `disclaimer_accepted` bool ·
-`delay_minutes` int (3–45) · `updated_at`. Opt-in Auto RPA preferences for the
-desktop app.
+Extension Auto mode preferences (table name is historical). `user_id` PK FK→users ·
+`enabled` bool · `disclaimer_accepted` bool (required before Auto send) ·
+`delay_minutes` int (3–45) · `updated_at`. Synced via `/ext/settings`.
 
 ### `subscriptions`
-`id` PK · `user_id` FK→users · `plan` `plan` · `platforms_allowed` int (1 or 3) ·
+`id` PK · `user_id` FK→users · `plan` `plan` · `platforms_allowed` int (1 for Basic, 2 for Pro) ·
 `started_at` · `expires_at` · `active` bool.
 
 ### `payments`
@@ -85,9 +86,16 @@ FK→users.
 
 ### `projects`
 `id` PK · `user_id` FK→users · `platform` `project_platform` · `client_name` ·
-`status` `project_status` · `project_json` jsonb · `build_spec` jsonb ·
-`brief_score` int · `agent2_status` `agent2_status` · `preview_url` ·
-`preview_slug` · `created_at`.
+`thread_id` text · `status` `project_status` · `project_json` jsonb ·
+`build_spec` jsonb · `brief_score` int · `agent2_status` `agent2_status` ·
+`preview_url` · `preview_slug` · `created_at`. Unique `(user_id, platform,
+thread_id)` when `thread_id` is set. `project_json.client_username` stores the
+marketplace handle (e.g. `FLGrace`) when the extension provides it.
+
+### `conversation_messages`
+Full inbox log per thread (extension → backend). `id` PK · `user_id` FK→users ·
+`platform` `project_platform` · `thread_id` text · `role` `message_role` · `text`
+· `sent_at` timestamptz · `created_at`.
 
 ### `message_events`
 `id` PK · `user_id` FK→users · `platform` `project_platform` · `client_name` ·
@@ -107,7 +115,8 @@ PK `(ip, endpoint)`.
 ## RLS policy summary
 
 - **Owner-scoped tables** (`users`, `agent_personas`, `invite_codes`,
-  `subscriptions`, `payments`, `projects`, `message_events`, `telegram_links`):
+  `subscriptions`, `payments`, `projects`, `conversation_messages`,
+  `message_events`, `telegram_links`):
   a user may `select`/`update` only rows where the owner column = `auth.uid()`.
   Inserts that create user-owned data are constrained the same way.
 - **`referrals`**: visible to either the `referrer_id` or `referred_id`.

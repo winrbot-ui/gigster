@@ -35,11 +35,16 @@ if (!url || !serviceKey) {
   process.exit(1);
 }
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@gigster.website";
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "kosta";
-const ADMIN_PASSWORD =
-  process.env.ADMIN_PASSWORD ||
-  `Gigster!${randomBytes(4).toString("hex")}`;
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
+if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
+  console.error(
+    "Set ADMIN_EMAIL and ADMIN_PASSWORD env vars before running bootstrap-admin.mjs",
+  );
+  process.exit(1);
+}
 
 const supabase = createClient(url, serviceKey, {
   auth: { persistSession: false, autoRefreshToken: false },
@@ -102,15 +107,15 @@ async function main() {
 
   await supabase.from("agent_personas").upsert({
     user_id: userId,
-    agent_name: "Kosta",
-    full_name: "Kosta",
+    agent_name: "Admin",
+    full_name: "Admin",
     title: "Small Business Website Developer",
     specialty: "WordPress, business sites, landing pages",
     tone: "Professional but warm, direct",
     never_say: ["As an AI", "I'm a bot"],
     always_do: "Client first name, 2-5 sentences, max 2 questions",
     experience_years: 6,
-    location: "CET",
+    location: "US / Eastern",
   });
 
   await supabase.from("telegram_links").upsert({
@@ -121,7 +126,7 @@ async function main() {
   await supabase.from("subscriptions").upsert({
     user_id: userId,
     plan: "pro",
-    platforms_allowed: 3,
+    platforms_allowed: 2,
     started_at: new Date().toISOString(),
     expires_at: new Date(Date.now() + 365 * 86400000).toISOString(),
     active: true,

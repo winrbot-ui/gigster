@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Gigster Upwork",
+  "version": "0.0.0",
+  "description": "Gigster Upwork — coming soon.",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://www.upwork.com/*",
+    "http://localhost:8000/*",
+    "https://*.gigster.website/*"
+  ],
+  "action": {
+    "default_title": "Gigster Upwork"
+  }
+}

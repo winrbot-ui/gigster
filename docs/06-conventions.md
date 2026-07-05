@@ -5,22 +5,27 @@
 npm workspaces. Dependencies hoist to the root `node_modules`.
 
 ```
-apps/web/              Next.js 16 app (gigster.website)
-  app/(public)/        landing, apply-marketer, tos
-  app/(gate)/          invite gate (Turnstile)
-  app/(auth)/          signup, login, verify
-  app/(app)/           dashboard, agent-setup, projects (active sub)
-  app/marketer/        marketer dashboard (role=marketer)
-  app/admin/           admin panel (role=admin)
-  app/api/             thin route handlers / proxy to backend
-  components/          shared UI (ui/ = base design-system primitives)
-  lib/                 supabase clients, api client, auth/role helpers
-apps/backend/          FastAPI (later phase)
-apps/desktop/          Tauri (later phase)
-packages/shared-types/ shared schemas (build_spec, project_json, persona, rows)
-infra/supabase/        migrations + RLS policies (on-disk source of truth)
-docs/                  this documentation (00–07)
+apps/web/                  Next.js 16 app (gigster.website)
+  app/(public)/            landing, apply-marketer, tos
+  app/(gate)/                invite gate (Turnstile)
+  app/(auth)/                signup, login, verify
+  app/(app)/                 dashboard, agent-setup, projects (active sub)
+  app/marketer/              marketer dashboard (role=marketer)
+  app/admin/                 admin panel (role=admin)
+  app/api/                   thin route handlers / proxy to backend
+  components/                shared UI (ui/ = base design-system primitives)
+  lib/                       supabase clients, api client, auth/role helpers
+apps/backend/                FastAPI (Railway)
+apps/extension-fiverr/       Chrome MV3 — Fiverr inbox adapter (active)
+apps/extension-freelancer/   Chrome MV3 — Freelancer inbox adapter (active)
+apps/extension-upwork/       Chrome MV3 — Upwork scaffold (coming soon, not in UI)
+packages/shared-types/       shared schemas (build_spec, project_json, persona, rows)
+infra/supabase/              migrations + RLS policies (on-disk source of truth)
+docs/                        this documentation (00–08)
 ```
+
+Build an extension: `npm run build:extension:fiverr` (or `:freelancer`). Load
+unpacked from `apps/extension-<platform>/dist`.
 
 ## Next.js 16 — read first
 
@@ -53,8 +58,7 @@ Copy `.env.example` → `apps/web/.env.local`. Rules:
 
 - `NEXT_PUBLIC_*` is the **only** prefix exposed to the browser. Never put secrets
   there.
-- Server-only secrets (service role key, AI keys, backend keys) have no prefix and
-  live on the backend / Next.js server only.
+- Server-only secrets (service role key, AI keys, backend keys) live on the backend / Next.js server only.
 
 | Var | Scope | Purpose |
 | --- | --- | --- |

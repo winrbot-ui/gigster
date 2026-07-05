@@ -42,11 +42,11 @@ export function PersonaForm({ persona }: PersonaFormProps) {
           <form action={formAction} className="grid gap-5 sm:grid-cols-2">
             <div className="flex flex-col gap-2">
               <Label htmlFor="agent_name">Agent name</Label>
-              <Input id="agent_name" name="agent_name" defaultValue={persona?.agent_name ?? ""} />
+              <Input id="agent_name" name="agent_name" placeholder="Jordan" defaultValue={persona?.agent_name ?? ""} />
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="full_name">Full name</Label>
-              <Input id="full_name" name="full_name" defaultValue={persona?.full_name ?? ""} />
+              <Input id="full_name" name="full_name" placeholder="Jordan Smith" defaultValue={persona?.full_name ?? ""} />
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="title">Title</Label>
@@ -62,7 +62,7 @@ export function PersonaForm({ persona }: PersonaFormProps) {
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="location">Location</Label>
-              <Input id="location" name="location" defaultValue={persona?.location ?? ""} />
+              <Input id="location" name="location" placeholder="US / Eastern" defaultValue={persona?.location ?? ""} />
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="experience_years">Experience (years)</Label>

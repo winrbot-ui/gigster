@@ -30,7 +30,7 @@ export function LoginForm({ blocked = false }: { blocked?: boolean }) {
       <CardHeader>
         <CardTitle>Welcome back</CardTitle>
         <CardDescription>
-          One login for dashboard, admin, and desktop. Use @nickname or email.
+          One login for dashboard and admin. Use @nickname or email.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-5">
@@ -45,7 +45,7 @@ export function LoginForm({ blocked = false }: { blocked?: boolean }) {
             <form action={formAction} className="flex flex-col gap-5">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="identifier">@nickname or email</Label>
-                <Input id="identifier" name="identifier" placeholder="@kosta or you@example.com" required />
+                <Input id="identifier" name="identifier" placeholder="@jordan or you@email.com" required />
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="password">Password</Label>

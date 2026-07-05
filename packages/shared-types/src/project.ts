@@ -1,11 +1,14 @@
+import type { BriefDecisionAction } from "./brief-decision";
 import type { ProjectPlatform, ProjectStatus } from "./enums";
 
 /**
  * project_json — the evolving structured understanding of a single client
- * conversation. Updated by Agent 1 CALL 1 (Extract) on each new OCR batch.
+ * conversation. Updated by Agent 1 CALL 1 (Extract) on each new inbox batch.
  */
 export interface ProjectJson {
   client_name: string | null;
+  /** Marketplace handle, e.g. FLGrace on Freelancer or inbox username on Fiverr. */
+  client_username?: string | null;
   platform: ProjectPlatform | null;
   /** Short summary of what the client wants. */
   summary: string | null;
@@ -21,11 +24,16 @@ export interface ProjectJson {
   client_confirmed: boolean;
   /** Free-form notes that do not fit elsewhere. */
   notes: string | null;
+  /** Member choice after brief readiness (extension popup or dashboard). */
+  brief_decision?: BriefDecisionAction | null;
+  /** Internal: marketplace thread id when DB column is unavailable. */
+  _thread_id?: string | null;
 }
 
 export function emptyProjectJson(): ProjectJson {
   return {
     client_name: null,
+    client_username: null,
     platform: null,
     summary: null,
     requirements: [],

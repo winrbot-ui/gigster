@@ -22,3 +22,28 @@ async def notify_new_message(
     emoji = "🔔"
     text = f"{emoji} {platform.title()} — {client_name} — new message\nMode: {mode.title()}"
     return await send_telegram(chat_id, text)
+
+
+async def notify_new_client(
+    chat_id: str,
+    platform: str,
+    client_name: str,
+) -> bool:
+    text = (
+        f"🆕 New client — {platform.title()} / {client_name}\n"
+        "First contact detected. Gigster created a project and will draft replies."
+    )
+    return await send_telegram(chat_id, text)
+
+
+async def notify_brief_ready(chat_id: str, platform: str, client_name: str) -> bool:
+    text = (
+        f"✅ Brief ready — {platform.title()} / {client_name}\n"
+        "Choose build site, download brief, or both in the extension popup."
+    )
+    return await send_telegram(chat_id, text)
+
+
+async def notify_site_ready(chat_id: str, client_name: str, preview_url: str) -> bool:
+    text = f"🚀 Site ready for {client_name}\n{preview_url}"
+    return await send_telegram(chat_id, text)

@@ -28,7 +28,7 @@ export async function sendMembershipActivatedEmail(
     "Your Gigster account is live",
     `<p>Hi @${username},</p>
      <p>Your membership payment was verified. You now have full access to Gigster.</p>
-     <p><a href="${site}/desktop">Download the Desktop app</a> and link Telegram for message alerts.</p>
+     <p><a href="${site}/dashboard">Open your dashboard</a> and link Telegram for message alerts.</p>
      <p>Dashboard: <a href="${site}/dashboard">${site}/dashboard</a></p>`,
   );
 }

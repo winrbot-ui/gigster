@@ -1,28 +1,48 @@
 # 04 — Agent 2 (Build & Deploy)
 
 Agent 2 turns a confirmed `build_spec` into a deployed preview site at
-`slug.gigsterr.online`.
+`slug.gigsterr.online`. Builds run **asynchronously** — never blocking the
+`/ext/thread` response.
 
 ## Flow
 
 ```
-build_spec
-   │
-   ▼ Validate      schema + capabilities, no blockers
-   │
-   ▼ Pick template business / landing / restaurant
-   │
-   ▼ Generate      Claude produces the site from the template + spec
-   │
-   ▼ Build         npm install + build, max 3 retries
-   │
-   ▼ Deploy        Vercel API alias → slug.gigsterr.online
-   │
-   ▼ Dashboard "Ready" + preview_url
+Member chooses build or both (POST /ext/brief/decision)
+        │
+        ▼ CALL 3 Brief (if not already) → build_spec persisted
+        │
+        ▼ Background task enqueued
+        │
+        ▼ Validate      schema + capabilities, no blockers
+        │
+        ▼ Pick template   business / landing / restaurant
+        │
+        ▼ Generate        Claude produces the site from the template + spec
+        │
+        ▼ Build           npm install + build, max 3 retries
+        │
+        ▼ Deploy          Vercel API alias → slug.gigsterr.online
+        │
+        ▼ Dashboard / popup "Ready" + preview_url
 ```
 
 `agent2_status` on the project row tracks this: `idle → building → ready` (or
 `failed`). On success, `preview_url` and `preview_slug` are set.
+
+The extension popup and dashboard **poll** `agent2_status` (via project fetch or
+dedicated status endpoint) while `building`. The synchronous `/ext/thread` response
+does not wait for deploy to finish.
+
+## Triggers
+
+| Source | When |
+| --- | --- |
+| `POST /ext/brief/decision` (`build` or `both`) | Member confirms via extension popup |
+| Dashboard **Retry Agent 2** | Manual retry after `failed` |
+| `POST /ai/agent2` or cron retry | Admin / recovery paths |
+
+The `document` action generates a client-facing Markdown + PDF brief only — no
+Agent 2 run.
 
 ## `build_spec` schema
 
@@ -66,3 +86,13 @@ failed`, surfaced in the dashboard with a retry affordance.
 Preview sites deploy to `{slug}.gigsterr.online`. DNS and Vercel setup are
 documented in `infra/vercel-agent2-domain.md`. Set `VERCEL_TOKEN`,
 `VERCEL_AGENT2_PROJECT_NAME`, and `AGENT2_DOMAIN` on the backend.
+
+## Brief document (document / both actions)
+
+When the member chooses `document` or `both`, the backend renders a clean client
+brief from `project_json` / `build_spec`:
+
+- **Markdown** — title, requirements, budget, deadline, open questions
+- **PDF** — same content, formatted for delivery to the client
+
+Returned as a downloadable response from the brief-decision handler.

@@ -5,7 +5,9 @@ import {
   emptyProjectJson,
   isBriefReady,
   canUsePlatform,
+  isPlatformAvailable,
   platformLimitMessage,
+  type BriefDecisionAction,
   type ProjectPlatform,
 } from "@gigster/shared-types";
 import { createClient } from "@/lib/supabase/server";
@@ -23,8 +25,8 @@ export async function createProject(
   const platform = String(formData.get("platform") ?? "") as ProjectPlatform;
   const clientName = String(formData.get("client_name") ?? "").trim();
 
-  if (!["upwork", "fiverr", "freelancer"].includes(platform)) {
-    return { error: "Select a platform." };
+  if (!isPlatformAvailable(platform)) {
+    return { error: "Upwork is coming soon — choose Fiverr or Freelancer." };
   }
   if (!clientName) return { error: "Client name is required." };
 
@@ -82,7 +84,10 @@ export async function generateBriefAction(
   return generateBrief(projectId);
 }
 
-async function generateBrief(projectId: string): Promise<ProjectActionState> {
+export async function submitBriefDecisionAction(
+  projectId: string,
+  action: BriefDecisionAction,
+): Promise<ProjectActionState> {
   const user = await requireActive();
 
   const supabase = await createClient();
@@ -107,19 +112,37 @@ async function generateBrief(projectId: string): Promise<ProjectActionState> {
   }
 
   try {
-    const res = await backendFetch("/ai/brief", {
+    const res = await backendFetch("/ext/brief/decision", {
       method: "POST",
-      body: JSON.stringify({ project_id: projectId }),
+      body: JSON.stringify({ project_id: projectId, action }),
     });
     if (!res.ok) {
       const body = (await res.json()) as { detail?: string };
-      return { error: body.detail ?? "Brief generation failed." };
+      return { error: body.detail ?? "Brief decision failed." };
     }
     revalidatePath("/projects");
-    return { success: "Brief generated. Agent 2 build queued." };
+    const labels: Record<BriefDecisionAction, string> = {
+      build: "Agent 2 build queued.",
+      document: "Brief document ready — download from the project card.",
+      both: "Build queued and brief document ready.",
+    };
+    return { success: labels[action] };
   } catch {
     return { error: "Backend unavailable. Set GIGSTER_API_URL and start the API." };
   }
+}
+
+export async function briefDecisionFormAction(
+  projectId: string,
+  action: BriefDecisionAction,
+  _prev: ProjectActionState,
+  _formData: FormData,
+): Promise<ProjectActionState> {
+  return submitBriefDecisionAction(projectId, action);
+}
+
+async function generateBrief(projectId: string): Promise<ProjectActionState> {
+  return submitBriefDecisionAction(projectId, "build");
 }
 
 export async function generateBriefFormAction(

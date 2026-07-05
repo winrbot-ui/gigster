@@ -10,7 +10,7 @@
 - **Public:** `/`, `/apply-marketer`, `/tos`, `/join?ref=`, the invite gate.
   Keep public pages minimal — no sensitive data.
 - **Closed (JWT + active subscription):** `/dashboard`, `/agent-setup`,
-  `/projects`, `/buy`, desktop endpoints, `/marketer` (role), `/admin` (role).
+  `/projects`, `/buy`, extension endpoints (`/ext/*`), `/marketer` (role), `/admin` (role).
   Sensitive content is server-rendered behind auth.
 
 ## Auth & access
@@ -31,7 +31,7 @@
 ## Secrets & prompts
 
 - **AI prompts and persona logic live only on the backend.** They are never in
-  the web bundle and never in the desktop bundle.
+  the web bundle and never in the extension bundle.
 - Service role key, Anthropic/OpenAI keys, Resend, Telegram, and Vercel API keys
   live only on the backend (and, for the service role key, the Next.js server
   for auth-gated reads). Never `NEXT_PUBLIC_*`.

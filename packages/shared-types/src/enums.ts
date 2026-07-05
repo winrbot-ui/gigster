@@ -18,10 +18,10 @@ export type UserStatus = (typeof USER_STATUSES)[number];
 export const PLANS = ["basic", "pro"] as const;
 export type Plan = (typeof PLANS)[number];
 
-/** Platforms allowed per plan. */
+/** Distinct marketplace platforms allowed per plan (Fiverr + Freelancer only; Upwork is coming soon). */
 export const PLAN_PLATFORMS: Record<Plan, number> = {
   basic: 1,
-  pro: 3,
+  pro: 2,
 };
 
 /** Plan price in USD (USDT TRC-20, manual). */

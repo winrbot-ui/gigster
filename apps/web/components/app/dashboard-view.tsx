@@ -48,8 +48,8 @@ export function DashboardView({ user, stats, invite, inviteLink, persona }: Dash
         <CardContent className="grid gap-3 text-sm sm:grid-cols-2">
           <div className="flex flex-col gap-2">
             <p>
-              <span className="font-medium text-foreground">1. You</span> — set persona, invite members, use{" "}
-              <Link href="/desktop" className="text-accent-strong hover:underline">Desktop app</Link>.
+              <span className="font-medium text-foreground">1. You</span> — set persona in{" "}
+              <Link href="/agent-setup" className="text-accent-strong hover:underline">Agent setup</Link>.
             </p>
             <p>
               <span className="font-medium text-foreground">2. Members</span> — pay USDT → you verify on{" "}

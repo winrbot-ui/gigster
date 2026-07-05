@@ -1,11 +1,16 @@
 "use client";
 
 import { useActionState } from "react";
-import type { ProjectPlatform, ProjectRow } from "@gigster/shared-types";
-import { canUsePlatform, isBriefReady } from "@gigster/shared-types";
+import type { BriefDecisionAction, ProjectRow } from "@gigster/shared-types";
 import {
+  canUsePlatform,
+  isBriefReady,
+  isPlatformAvailable,
+  PLATFORM_CATALOG,
+} from "@gigster/shared-types";
+import {
+  briefDecisionFormAction,
   createProject,
-  generateBriefAction,
   retryAgent2Action,
   updatePreviewSlugAction,
   type ProjectActionState,
@@ -21,15 +26,75 @@ import { Badge } from "@/components/ui/badge";
 interface ProjectsViewProps {
   projects: ProjectRow[];
   platformsAllowed: number;
-  usedPlatforms: ProjectPlatform[];
+  usedPlatforms: import("@gigster/shared-types").ProjectPlatform[];
   limitMessage: string;
 }
 
-const ALL_PLATFORMS: { value: ProjectPlatform; label: string }[] = [
-  { value: "upwork", label: "Upwork" },
-  { value: "fiverr", label: "Fiverr" },
-  { value: "freelancer", label: "Freelancer" },
+const ALL_PLATFORMS = PLATFORM_CATALOG.map((p) => ({
+  value: p.id,
+  label: p.label,
+  comingSoon: p.availability === "coming_soon",
+}));
+
+const BRIEF_ACTIONS: { action: BriefDecisionAction; label: string; variant: "primary" | "secondary" }[] = [
+  { action: "build", label: "Build site (Agent 2)", variant: "primary" },
+  { action: "document", label: "Download client brief", variant: "secondary" },
+  { action: "both", label: "Both", variant: "secondary" },
 ];
+
+function BriefDecisionButton({
+  projectId,
+  action,
+  label,
+  variant,
+}: {
+  projectId: string;
+  action: BriefDecisionAction;
+  label: string;
+  variant: "primary" | "secondary";
+}) {
+  const bound = briefDecisionFormAction.bind(null, projectId, action);
+  const [state, formAction, pending] = useActionState<ProjectActionState, FormData>(bound, {});
+
+  return (
+    <div className="flex flex-col gap-1">
+      <form action={formAction}>
+        <Button type="submit" size="sm" variant={variant} disabled={pending}>
+          {pending ? "Processing…" : label}
+        </Button>
+      </form>
+      {state.error && <p className="text-sm text-danger">{state.error}</p>}
+      {state.success && <p className="text-sm text-success">{state.success}</p>}
+    </div>
+  );
+}
+
+function BriefDecisionButtons({ projectId, ready }: { projectId: string; ready: boolean }) {
+  if (!ready) {
+    return (
+      <p className="text-xs text-muted">
+        Requires score ≥85, status deal, and client confirmed.
+      </p>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <p className="text-sm font-medium">Brief ready — choose next step</p>
+      <div className="flex flex-wrap gap-2">
+        {BRIEF_ACTIONS.map(({ action, label, variant }) => (
+          <BriefDecisionButton
+            key={action}
+            projectId={projectId}
+            action={action}
+            label={label}
+            variant={variant}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function ProjectCard({ project: p }: { project: ProjectRow }) {
   const pj = p.project_json;
@@ -40,14 +105,10 @@ function ProjectCard({ project: p }: { project: ProjectRow }) {
         client_confirmed: pj.client_confirmed ?? false,
       })
     : false;
+  const awaitingDecision = ready && !pj?.brief_decision;
 
   const [slugState, slugAction, slugPending] = useActionState<ProjectActionState, FormData>(
     updatePreviewSlugAction.bind(null, p.id),
-    {},
-  );
-
-  const [briefState, briefAction, briefPending] = useActionState<ProjectActionState, FormData>(
-    async () => generateBriefAction(p.id),
     {},
   );
 
@@ -55,6 +116,8 @@ function ProjectCard({ project: p }: { project: ProjectRow }) {
     async () => retryAgent2Action(p.id),
     {},
   );
+
+  const briefDocUrl = `/api/brief-document/${p.id}`;
 
   return (
     <Card>
@@ -64,6 +127,9 @@ function ProjectCard({ project: p }: { project: ProjectRow }) {
           <div className="flex gap-2">
             <Badge tone="accent">{p.platform}</Badge>
             <Badge tone="neutral">{p.agent2_status}</Badge>
+            {pj?.brief_decision && (
+              <Badge tone="neutral">Brief: {pj.brief_decision}</Badge>
+            )}
           </div>
         </div>
         <CardDescription>
@@ -93,6 +159,20 @@ function ProjectCard({ project: p }: { project: ProjectRow }) {
           </a>
         )}
 
+        {p.agent2_status === "building" && (
+          <p className="text-sm text-muted">Agent 2 is building — refresh to check status.</p>
+        )}
+
+        {(pj?.brief_decision === "document" || pj?.brief_decision === "both") && (
+          <a
+            href={briefDocUrl}
+            className="text-sm text-accent-strong hover:underline"
+            download
+          >
+            Download client brief (PDF)
+          </a>
+        )}
+
         {p.build_spec && (
           <details className="text-sm">
             <summary className="cursor-pointer text-muted hover:text-foreground">
@@ -112,7 +192,7 @@ function ProjectCard({ project: p }: { project: ProjectRow }) {
                 id={`slug-${p.id}`}
                 name="slug"
                 defaultValue={p.preview_slug ?? ""}
-                placeholder="john-smith-consulting"
+                placeholder="acme-consulting"
               />
             </div>
             <Button type="submit" variant="secondary" size="sm" disabled={slugPending}>
@@ -123,18 +203,15 @@ function ProjectCard({ project: p }: { project: ProjectRow }) {
           {slugState.success && <p className="mt-1 text-sm text-success">{slugState.success}</p>}
         </form>
 
-        <form action={briefAction}>
-          <Button type="submit" size="sm" disabled={!ready || briefPending}>
-            {briefPending ? "Generating…" : "Generate Brief → Agent 2"}
-          </Button>
-          {!ready && (
-            <p className="mt-1 text-xs text-muted">
-              Requires score ≥85, status deal, and client confirmed.
-            </p>
-          )}
-          {briefState.error && <p className="mt-1 text-sm text-danger">{briefState.error}</p>}
-          {briefState.success && <p className="mt-1 text-sm text-success">{briefState.success}</p>}
-        </form>
+        {awaitingDecision ? (
+          <BriefDecisionButtons projectId={p.id} ready={ready} />
+        ) : (
+          ready &&
+          !p.build_spec &&
+          pj?.brief_decision !== "document" && (
+            <p className="text-xs text-muted">Brief decision recorded.</p>
+          )
+        )}
 
         {(p.agent2_status === "failed" && p.build_spec) && (
           <form action={retryAction}>
@@ -185,21 +262,23 @@ export function ProjectsView({
                 name="platform"
                 className="rounded-lg border border-border bg-surface px-3 py-2 text-sm"
                 defaultValue={
-                  ALL_PLATFORMS.find((p) =>
-                    canUsePlatform(platformsAllowed, usedPlatforms, p.value),
-                  )?.value ?? "upwork"
+                  ALL_PLATFORMS.find(
+                    (p) =>
+                      isPlatformAvailable(p.value) &&
+                      canUsePlatform(platformsAllowed, usedPlatforms, p.value),
+                  )?.value ?? "fiverr"
                 }
               >
                 {ALL_PLATFORMS.map((p) => {
-                  const selectable = canUsePlatform(
-                    platformsAllowed,
-                    usedPlatforms,
-                    p.value,
-                  );
+                  const available = isPlatformAvailable(p.value);
+                  const selectable =
+                    available &&
+                    canUsePlatform(platformsAllowed, usedPlatforms, p.value);
                   return (
                     <option key={p.value} value={p.value} disabled={!selectable}>
                       {p.label}
-                      {!selectable ? " (plan limit)" : ""}
+                      {p.comingSoon ? " — Updating, coming soon" : ""}
+                      {!p.comingSoon && !selectable ? " (plan limit)" : ""}
                     </option>
                   );
                 })}
@@ -207,7 +286,7 @@ export function ProjectsView({
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="client_name">Client name</Label>
-              <Input id="client_name" name="client_name" placeholder="John Smith" required />
+              <Input id="client_name" name="client_name" placeholder="Sarah Miller" required />
             </div>
             <div className="flex items-end">
               <Button type="submit" disabled={pending}>
@@ -228,7 +307,7 @@ export function ProjectsView({
           <CardContent className="flex flex-col items-center gap-2 py-16 text-center">
             <p className="text-sm font-medium">No projects yet</p>
             <p className="max-w-sm text-sm text-muted">
-              Create a project manually or wait for the desktop app to detect new messages.
+              Create a project manually or use the Chrome extension on Fiverr or Freelancer.
             </p>
           </CardContent>
         </Card>

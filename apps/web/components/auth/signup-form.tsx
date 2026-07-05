@@ -41,12 +41,12 @@ export function SignupForm({ turnstileSiteKey }: SignupFormProps) {
             <Label htmlFor="username">Your @nickname</Label>
             <div className="flex items-center gap-2">
               <span className="text-muted">@</span>
-              <Input id="username" name="username" placeholder="marko" required />
+              <Input id="username" name="username" placeholder="jordan" required />
             </div>
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" name="email" type="email" placeholder="you@example.com" required />
+            <Input id="email" name="email" type="email" placeholder="you@email.com" required />
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="password">Password</Label>

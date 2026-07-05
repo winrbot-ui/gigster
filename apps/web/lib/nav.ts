@@ -7,7 +7,7 @@ export function buildMemberNav(user: UserRow): NavItem[] {
     { href: "/dashboard", label: "Dashboard" },
     { href: "/projects", label: "Projects" },
     { href: "/agent-setup", label: "Agent setup" },
-    { href: "/desktop", label: "Desktop app" },
+    { href: "/guide", label: "Guide" },
     { href: "/settings", label: "Settings" },
   ];
 
