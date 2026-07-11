@@ -76,7 +76,9 @@ Run all SQL files in order (SQL Editor → New query → paste → Run):
 3. Service **Settings → Config file path:** `/apps/backend/railway.toml`  
    (Railway does **not** auto-load config from Root Directory — this step is required.)
 4. Service **Settings → Build → Builder:** `Dockerfile` (not Nixpacks / npm)
-5. **Clear** any custom Start Command or Build Command on the service (Dockerfile `CMD` runs the API).
+5. **Clear** any custom Start Command in the dashboard (Settings → Deploy).  
+   If it still says `npm run start`, Railway will crash with `npm could not be found`  
+   inside the Python Docker image. `railway.toml` now sets uvicorn explicitly.
 6. **Variables** (not Vercel `NEXT_PUBLIC_*`):
 
 ```
