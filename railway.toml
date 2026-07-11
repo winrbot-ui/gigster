@@ -1,0 +1,11 @@
+# Used when @gigster/backend Root Directory is repo root.
+# Prefer setting Root Directory = apps/backend (uses apps/backend/railway.toml).
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 120
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3

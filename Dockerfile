@@ -1,3 +1,5 @@
+# Fallback when Railway service Root Directory is repo root (not apps/backend).
+# Prefer: @gigster/backend → Settings → Root Directory = apps/backend
 FROM python:3.11-slim
 
 WORKDIR /app
@@ -6,10 +8,10 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PORT=8000
 
-COPY requirements.txt .
+COPY apps/backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app ./app
+COPY apps/backend/app ./app
 
 EXPOSE 8000
 
