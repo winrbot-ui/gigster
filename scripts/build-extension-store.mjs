@@ -4,7 +4,7 @@
  * Output: release/gigster-fiverr.zip, release/gigster-freelancer.zip
  */
 import { execSync } from "node:child_process";
-import { existsSync, mkdirSync, rmSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, rmSync, readFileSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -29,6 +29,13 @@ for (const { app, zip } of extensions) {
     throw new Error(`Missing dist for ${app}`);
   }
 
+  // Chrome Web Store rejects manifest "key" (dev-only for stable unpacked ID).
+  const manifestPath = join(dist, "manifest.json");
+  const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+  delete manifest.key;
+  writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+  console.log("  stripped manifest.key for Web Store");
+
   mkdirSync(releaseDir, { recursive: true });
   const zipPath = join(releaseDir, zip);
   if (existsSync(zipPath)) rmSync(zipPath);
@@ -43,5 +50,6 @@ for (const { app, zip } of extensions) {
 }
 
 console.log("\nDone. Upload zips from release/ to Chrome Web Store Developer Dashboard.");
-console.log("Extension IDs (stable):", keys.railway.CORS_EXTENSION_IDS);
-console.log("Set Railway CORS_EXTENSION_IDS to that value, or run: npm run sync:railway");
+console.log("Note: Store zips omit manifest.key — Google assigns the extension ID after publish.");
+console.log("After publish, add the new ID(s) to Railway CORS_EXTENSION_IDS.");
+console.log("Dev Load unpacked IDs (with key):", keys.railway.CORS_EXTENSION_IDS);

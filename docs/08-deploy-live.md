@@ -162,7 +162,8 @@ Creates:
 - `release/gigster-fiverr.zip`
 - `release/gigster-freelancer.zip`
 
-Each zip contains `dist/` with production `apiBase` → Railway URL and updated `host_permissions`.
+Each zip contains production `apiBase` and omits manifest `key` (required for Web Store upload).
+After publish, update Railway `CORS_EXTENSION_IDS` with the Store-assigned extension ID.
 
 ### Chrome Web Store (one-time)
 
