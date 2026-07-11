@@ -4,12 +4,13 @@
  * Output: release/gigster-fiverr.zip, release/gigster-freelancer.zip
  */
 import { execSync } from "node:child_process";
-import { existsSync, mkdirSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, rmSync, readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const releaseDir = join(root, "release");
+const keys = JSON.parse(readFileSync(join(root, "infra/chrome-extension-keys.json"), "utf8"));
 
 const extensions = [
   { app: "extension-fiverr", zip: "gigster-fiverr.zip" },
@@ -42,4 +43,5 @@ for (const { app, zip } of extensions) {
 }
 
 console.log("\nDone. Upload zips from release/ to Chrome Web Store Developer Dashboard.");
-console.log("After install, copy each extension ID → Railway CORS_EXTENSION_IDS.");
+console.log("Extension IDs (stable):", keys.railway.CORS_EXTENSION_IDS);
+console.log("Set Railway CORS_EXTENSION_IDS to that value, or run: npm run sync:railway");

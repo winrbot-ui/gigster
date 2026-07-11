@@ -22,6 +22,8 @@
     "setup:extension:prod": "node scripts/setup-extension.mjs --production",
     "build:extension:prod": "node scripts/setup-extension.mjs --production && npm run build:extension:fiverr && npm run build:extension:freelancer",
     "build:extension:store": "node scripts/build-extension-store.mjs",
+    "sync:railway": "node scripts/sync-railway-vars.mjs",
+    "railway:vars": "node scripts/print-railway-vars.mjs",
     "build": "npm run build --workspace @gigster/web",
     "start": "npm run start --workspace @gigster/web",
     "lint": "npm run lint --workspace @gigster/web",

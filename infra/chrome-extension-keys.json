@@ -1,0 +1,16 @@
+{
+  "note": "Public keys only — pins stable Chrome extension IDs for CORS. Regenerate with: node scripts/generate-extension-keys.mjs --write",
+  "extensions": {
+    "fiverr": {
+      "extensionId": "lfmmjponcopmghlpgmfgpnjeegbfbjeg",
+      "manifestKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjiQhlNnUdwleQ3IQDK1oQuZrNNSmmU8T+lvR4284HzWusivNxQMlFpnyJokqCPUD6F6iQ+05n68HVoCLgZZPNAo974Qhu2GnJnZkrR1HL7GgDeUZK2hI/Oui2ngAbH4XXrh59/UnJz0OtsBRok1RKIx1AIFkc57GIKC1GRkMIzE9J+dnT/HH9CeIGc/Ecv1mPqnq3Z4XLHGkAcazG/HN6l6wyut5jkLCeiRBazQy2Mj6PsmHwt4tYyAHN2ivpcmj7aZj3q00elHEzDOEnhPEaG6VpTB9zN+eNqwCjpYeOvyvnF34aBuJoQDqWPwcZ5QbYDoLYYhRF80zWH6k/b1MLQIDAQAB"
+    },
+    "freelancer": {
+      "extensionId": "mkmliddnbpnadmcpcjfinanpfajeiema",
+      "manifestKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqiNpPzS7ftCJPpDidc3kjGKPpU5AqwQ/LKxhminf/lBKUqEVwoagXQ04854vMN7PCyCplAZlZQ0ZvOpofUC83r2DQco8hKNqgTD5qcgVSMqo141J3YEg5vGz6raHZhVfeRFahK8S10CcFEytpB3HrxqNjisPUJ64sPtD3esm5vQZM34KfROk9O+tqn3YdJ5mmkOlwXvZn0k9UBRUkCvScwqhjKzUrZsnkW05eaWCv0Plw14JTs8BXL8m84j/KoHn99wPUxxdwxOXKh0STSHQh43LKunIY9OcNVJWyuAJEZwxbZNWb1K6uucIPxoIcXxKO4v7pnJ3I5uLu4cwr/RCNQIDAQAB"
+    }
+  },
+  "railway": {
+    "CORS_EXTENSION_IDS": "lfmmjponcopmghlpgmfgpnjeegbfbjeg,mkmliddnbpnadmcpcjfinanpfajeiema"
+  }
+}

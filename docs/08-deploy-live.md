@@ -179,8 +179,10 @@ After **Load unpacked** (beta) or **Web Store publish**, open `chrome://extensio
 Railway → `@gigster/backend` → **Variables**:
 
 ```
-CORS_EXTENSION_IDS=abc123...fiverr,def456...freelancer
+CORS_EXTENSION_IDS=lfmmjponcopmghlpgmfgpnjeegbfbjeg,mkmliddnbpnadmcpcjfinanpfajeiema
 ```
+
+(Stable IDs from `infra/chrome-extension-keys.json` — pinned via manifest `key` field.)
 
 Redeploy backend. Without this, extension API calls are blocked by CORS.
 

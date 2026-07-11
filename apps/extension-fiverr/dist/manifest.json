@@ -3,6 +3,7 @@
   "name": "Gigster Fiverr",
   "version": "0.6.1",
   "description": "Gigster Fiverr — AI inbox drafts for client replies (manual + auto send).",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjiQhlNnUdwleQ3IQDK1oQuZrNNSmmU8T+lvR4284HzWusivNxQMlFpnyJokqCPUD6F6iQ+05n68HVoCLgZZPNAo974Qhu2GnJnZkrR1HL7GgDeUZK2hI/Oui2ngAbH4XXrh59/UnJz0OtsBRok1RKIx1AIFkc57GIKC1GRkMIzE9J+dnT/HH9CeIGc/Ecv1mPqnq3Z4XLHGkAcazG/HN6l6wyut5jkLCeiRBazQy2Mj6PsmHwt4tYyAHN2ivpcmj7aZj3q00elHEzDOEnhPEaG6VpTB9zN+eNqwCjpYeOvyvnF34aBuJoQDqWPwcZ5QbYDoLYYhRF80zWH6k/b1MLQIDAQAB",
   "permissions": ["storage", "tabs", "scripting", "alarms"],
   "host_permissions": [
     "https://www.fiverr.com/*",

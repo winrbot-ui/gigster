@@ -3,6 +3,7 @@
   "name": "Gigster Freelancer",
   "version": "0.1.0",
   "description": "Gigster Freelancer — AI inbox drafts for client replies (manual + auto send).",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqiNpPzS7ftCJPpDidc3kjGKPpU5AqwQ/LKxhminf/lBKUqEVwoagXQ04854vMN7PCyCplAZlZQ0ZvOpofUC83r2DQco8hKNqgTD5qcgVSMqo141J3YEg5vGz6raHZhVfeRFahK8S10CcFEytpB3HrxqNjisPUJ64sPtD3esm5vQZM34KfROk9O+tqn3YdJ5mmkOlwXvZn0k9UBRUkCvScwqhjKzUrZsnkW05eaWCv0Plw14JTs8BXL8m84j/KoHn99wPUxxdwxOXKh0STSHQh43LKunIY9OcNVJWyuAJEZwxbZNWb1K6uucIPxoIcXxKO4v7pnJ3I5uLu4cwr/RCNQIDAQAB",
   "permissions": ["storage", "tabs", "scripting", "alarms"],
   "host_permissions": [
     "https://www.freelancer.com/*",
