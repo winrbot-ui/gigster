@@ -78,8 +78,10 @@ Run all SQL files in order (SQL Editor → New query → paste → Run):
 4. Service **Settings → Build → Builder:** `Dockerfile` (not Nixpacks / npm)
 5. **Clear** any custom Start Command in the dashboard (Settings → Deploy).  
    If it still says `npm run start`, Railway will crash with `npm could not be found`  
-   inside the Python Docker image. `railway.toml` now sets uvicorn explicitly.
-6. **Variables** (not Vercel `NEXT_PUBLIC_*`):
+   inside the Python Docker image. `railway.toml` uses `start.sh` (uvicorn on `$PORT`).
+6. **Networking → Public domain → Target port:** leave empty / automatic, or match `$PORT`.  
+   A hardcoded `8000` while the app listens on Railway's dynamic `PORT` causes **502**.
+7. **Variables** (not Vercel `NEXT_PUBLIC_*`):
 
 ```
 SUPABASE_URL=https://....supabase.co
