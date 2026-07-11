@@ -79,6 +79,32 @@ async def get_current_user_id(
         ) from exc
 
 
+async def require_agent1_user(user_id: str = Depends(get_current_user_id)) -> str:
+    """Gate for the free Agent 1 tier (drafting).
+
+    Agent 1 is free until the member's first concluded deal, so any member that
+    is not blocked or still pending email verification may draft. The paid payoff
+    (brief document + Agent 2) uses ``require_active_user`` instead.
+    """
+    sb = get_supabase_optional()
+    if not sb:
+        return user_id
+    row = first_row(
+        sb.table("users")
+        .select("status, role")
+        .eq("id", user_id)
+        .limit(1)
+        .execute()
+    )
+    if not row:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Account not found")
+    if row.get("role") == "admin":
+        return user_id
+    if row.get("status") in ("blocked", "pending_email"):
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Account not allowed")
+    return user_id
+
+
 async def require_active_user(user_id: str = Depends(get_current_user_id)) -> str:
     sb = get_supabase_optional()
     if not sb:

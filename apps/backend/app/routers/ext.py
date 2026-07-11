@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
-from app.auth import require_active_user
+from app.auth import require_active_user, require_agent1_user
 from app.db import get_supabase_optional, first_row
 from app.services import ext_threads
 from app.services.agent2.jobs import enqueue_agent2, agent2_status_for
@@ -47,9 +47,14 @@ class AutoSettingsRequest(BaseModel):
 @router.post("/thread")
 async def post_thread(
     body: ThreadRequest,
-    user_id: str = Depends(require_active_user),
+    user_id: str = Depends(require_agent1_user),
 ):
-    """Ingest inbox messages for a thread and return an on-persona draft."""
+    """Ingest inbox messages for a thread and return an on-persona draft.
+
+    Free tier: Agent 1 drafting works without an active subscription. The
+    response carries ``payment_required`` once the member closes a deal so the
+    extension can lock the paid payoff.
+    """
     sb = get_supabase_optional()
     if not sb:
         raise HTTPException(503, "Database not configured")
@@ -196,7 +201,7 @@ async def get_agent2_status(
 @router.post("/auto-settings")
 async def update_auto_settings(
     body: AutoSettingsRequest,
-    user_id: str = Depends(require_active_user),
+    user_id: str = Depends(require_agent1_user),
 ):
     sb = get_supabase_optional()
     if not sb:

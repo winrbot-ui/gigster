@@ -12,7 +12,7 @@ import {
 } from "@gigster/shared-types";
 import { createClient } from "@/lib/supabase/server";
 import { backendFetch } from "@/lib/api";
-import { requireActive } from "@/lib/auth";
+import { requireActive, requireMember } from "@/lib/auth";
 import { getPlatformLimitContext } from "@/lib/platform-limits";
 
 export type ProjectActionState = { error?: string; success?: string };
@@ -21,7 +21,7 @@ export async function createProject(
   _prev: ProjectActionState,
   formData: FormData,
 ): Promise<ProjectActionState> {
-  const user = await requireActive();
+  const user = await requireMember();
   const platform = String(formData.get("platform") ?? "") as ProjectPlatform;
   const clientName = String(formData.get("client_name") ?? "").trim();
 
@@ -55,7 +55,7 @@ export async function updatePreviewSlug(
   projectId: string,
   slug: string,
 ): Promise<ProjectActionState> {
-  await requireActive();
+  await requireMember();
   const cleaned = slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-");
   if (!cleaned) return { error: "Invalid slug." };
 

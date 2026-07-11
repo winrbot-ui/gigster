@@ -361,6 +361,7 @@ async function saveDraft(result, meta) {
       brief_score: result.brief_score,
       stage: result.stage,
       readiness: result.readiness,
+      payment_required: result.payment_required,
       awaiting_brief_decision: result.awaiting_brief_decision,
       brief_decision: result.project_json?.brief_decision,
       message_count: result.message_count,

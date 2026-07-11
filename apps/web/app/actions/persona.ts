@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import type { AgentPersona } from "@gigster/shared-types";
 import { createClient } from "@/lib/supabase/server";
-import { requireActive } from "@/lib/auth";
+import { requireMember } from "@/lib/auth";
 
 export type PersonaActionState = { error?: string; success?: string };
 
@@ -11,7 +11,7 @@ export async function savePersona(
   _prev: PersonaActionState,
   formData: FormData,
 ): Promise<PersonaActionState> {
-  const user = await requireActive();
+  const user = await requireMember();
 
   const neverSayRaw = String(formData.get("never_say") ?? "");
   const persona: Omit<AgentPersona, "user_id"> = {

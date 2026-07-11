@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { AgentPersonaRow, UserRow } from "@gigster/shared-types";
+import { PLAN_PRICE_USD, membershipRequiresPayment } from "@gigster/shared-types";
 import { PageHeader } from "@/components/app/app-shell";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -28,8 +29,15 @@ export function DashboardView({ user, stats, invite, inviteLink, persona }: Dash
   }
 
   const statusTone =
-    user.status === "active" ? "success" : user.status === "pending_payment" ? "accent" : "neutral";
+    user.status === "active"
+      ? "success"
+      : user.status === "pending_payment"
+        ? "accent"
+        : user.status === "free"
+          ? "accent"
+          : "neutral";
 
+  const needsPayment = membershipRequiresPayment(user);
   const invitePct = invite.limit > 0 ? Math.round((invite.usedThisMonth / invite.limit) * 100) : 0;
 
   return (
@@ -39,6 +47,34 @@ export function DashboardView({ user, stats, invite, inviteLink, persona }: Dash
         description="Your club at a glance."
         action={<Badge tone={statusTone}>{user.status.replace("_", " ")}</Badge>}
       />
+
+      {needsPayment && (
+        <Card className="mb-6 border-accent/50 bg-accent/5 shadow-[var(--shadow-elevated)]">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <CardTitle className="text-lg">You closed your first deal — activate your membership</CardTitle>
+              <Badge tone="accent">Payment required</Badge>
+            </div>
+            <CardDescription>
+              Agent 1 stays free for drafting replies. To unlock the client brief
+              document and the Agent 2 preview site for this deal, activate a plan.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <p className="text-sm text-muted">
+              Basic <span className="font-medium text-foreground">${PLAN_PRICE_USD.basic}</span>{" "}
+              (1 platform) or Pro{" "}
+              <span className="font-medium text-foreground">${PLAN_PRICE_USD.pro}</span>{" "}
+              (Fiverr + Freelancer) · 30 days · USDT (TRC-20).
+            </p>
+            <div>
+              <Link href="/buy" className={buttonClasses("primary", "md")}>
+                Activate membership
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="mb-6 border-accent/25 bg-surface-2/50">
         <CardHeader>

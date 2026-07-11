@@ -8,12 +8,47 @@ export type UserRole = (typeof USER_ROLES)[number];
 
 export const USER_STATUSES = [
   "pending_email",
+  "free",
   "pending_payment",
   "active",
   "expired",
   "blocked",
 ] as const;
 export type UserStatus = (typeof USER_STATUSES)[number];
+
+/**
+ * Statuses allowed to use Agent 1 (drafting) without an active subscription.
+ * Agent 1 is free; the paid payoff (brief document + Agent 2) requires `active`.
+ */
+export const AGENT1_STATUSES: readonly UserStatus[] = [
+  "free",
+  "pending_payment",
+  "active",
+  "expired",
+];
+
+/** True when the member may run Agent 1 drafting (free tier or paid). Admins always can. */
+export function canUseAgent1(
+  status: UserStatus,
+  role?: UserRole,
+): boolean {
+  if (role === "admin") return true;
+  return AGENT1_STATUSES.includes(status);
+}
+
+/**
+ * True when the member has closed their first deal but has no active membership,
+ * so the profile must prompt them to pay before unlocking the paid payoff.
+ */
+export function membershipRequiresPayment(user: {
+  status: UserStatus;
+  role?: UserRole;
+  has_reached_deal?: boolean | null;
+}): boolean {
+  if (user.role === "admin") return false;
+  if (user.status === "active") return false;
+  return Boolean(user.has_reached_deal);
+}
 
 export const PLANS = ["basic", "pro"] as const;
 export type Plan = (typeof PLANS)[number];

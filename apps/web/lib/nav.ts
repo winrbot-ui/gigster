@@ -12,7 +12,10 @@ export function buildMemberNav(user: UserRow): NavItem[] {
   ];
 
   if (user.status !== "active" && user.role !== "admin") {
-    nav.push({ href: "/buy", label: "Membership" });
+    nav.push({
+      href: "/buy",
+      label: user.has_reached_deal ? "Activate membership" : "Membership",
+    });
   }
 
   if (user.role === "marketer") {

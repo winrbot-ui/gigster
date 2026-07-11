@@ -24,6 +24,11 @@ Access is invite-only and paid (USDT TRC-20, manually verified).
   dashboard, marketer, admin). Agent 2 previews on `*.gigsterr.online`.
 - **Plans:** Basic $200 (1 platform) / Pro $300 (2 platforms: Fiverr + Freelancer), 30 days.
   Upwork is **coming soon** — not offered for new projects until released.
+- **Freemium:** Agent 1 (drafting client replies) is **free** — a member can sign up,
+  install the extension, and draft replies without paying. The first **concluded deal**
+  (brief ready) sets `users.has_reached_deal` and prompts payment. The paid payoff —
+  client **brief document** and **Agent 2** preview site — always requires an active
+  subscription. New members are `free` after email confirmation.
 - **Payment:** USDT TRC-20, manual. User submits `tx_hash` → admin verifies →
   subscription activates.
 - **Auth:** Supabase Auth (email verification, JWT, sessions).

@@ -1,7 +1,7 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/admin";
-import { requireActive } from "@/lib/auth";
+import { requireMember } from "@/lib/auth";
 import { inviteStatsFromCount } from "@/lib/invites";
 
 export async function getInviteStats(userId: string) {
@@ -20,7 +20,7 @@ export async function getInviteStats(userId: string) {
 }
 
 export async function getDashboardStats(userId: string) {
-  await requireActive();
+  await requireMember();
   const admin = createAdminClient();
 
   const [projects, drafts, sites] = await Promise.all([

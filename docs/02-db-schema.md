@@ -20,7 +20,7 @@ table. The matching TypeScript types live in `packages/shared-types`.
 | Enum | Values |
 | --- | --- |
 | `user_role` | `member`, `marketer`, `admin` |
-| `user_status` | `pending_email`, `pending_payment`, `active`, `expired`, `blocked` |
+| `user_status` | `pending_email`, `free`, `pending_payment`, `active`, `expired`, `blocked` |
 | `plan` | `basic`, `pro` |
 | `payment_status` | `submitted`, `verified`, `rejected` |
 | `project_platform` | `upwork`, `fiverr`, `freelancer` (Upwork enum value exists but is `coming_soon` — no new projects) |
@@ -41,10 +41,17 @@ Profile mirror of `auth.users`.
 | `username` | text unique | `@nickname`, fixed after signup |
 | `role` | `user_role` | default `member` |
 | `referred_by_id` | uuid FK→users | nullable |
-| `status` | `user_status` | default `pending_email` |
+| `status` | `user_status` | default `pending_email`; becomes `free` on email confirm |
 | `created_at` | timestamptz | |
 | `email_verified_at` | timestamptz | nullable |
 | `signup_ip` | inet | nullable; used for self-referral IP block |
+| `has_reached_deal` | boolean | default `false`; set on first concluded deal → triggers payment prompt |
+| `first_deal_at` | timestamptz | nullable; timestamp of the first concluded deal |
+
+**Freemium tier:** after email confirmation a member is `free` — Agent 1 drafting
+works without an active subscription. The first concluded deal (brief ready) sets
+`has_reached_deal` and the profile prompts for payment. The paid payoff (client
+brief document + Agent 2 site build) always requires an `active` subscription.
 
 ### `agent_personas`
 Live persona for Agent 1 (read live, never cached).

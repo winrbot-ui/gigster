@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { requireActive } from "@/lib/auth";
+import { requireMember } from "@/lib/auth";
 import { getProjects } from "@/app/actions/projects";
 import { getPlatformLimitContext } from "@/lib/platform-limits";
 import { ProjectsView } from "@/components/app/projects-view";
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ProjectsPage() {
-  const user = await requireActive();
+  const user = await requireMember();
   const [projects, platformLimits] = await Promise.all([
     getProjects(user.id),
     getPlatformLimitContext(user.id),

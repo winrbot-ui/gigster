@@ -9,9 +9,17 @@
 
 - **Public:** `/`, `/apply-marketer`, `/tos`, `/join?ref=`, the invite gate.
   Keep public pages minimal — no sensitive data.
-- **Closed (JWT + active subscription):** `/dashboard`, `/agent-setup`,
-  `/projects`, `/buy`, extension endpoints (`/ext/*`), `/marketer` (role), `/admin` (role).
-  Sensitive content is server-rendered behind auth.
+- **Free tier (JWT, any non-blocked member):** `/dashboard`, `/agent-setup`,
+  `/projects`, `/buy`, and Agent 1 drafting (`POST /ext/thread`, `/ext/auto-settings`).
+  Gated by `requireMember` (web) / `require_agent1_user` (backend). Agent 1 is free
+  until the member's first concluded deal.
+- **Paid (JWT + active subscription):** the client brief document
+  (`GET /ext/brief/document/*`), brief decision (`POST /ext/brief/decision`), and
+  Agent 2 (`/ext/agent2/*`, retry). Gated by `requireActive` (web) /
+  `require_active_user` (backend). The extension is useless for the paid payoff
+  without a live subscription, so copying the unpacked extension does not bypass it.
+- **Role-gated:** `/marketer` (role), `/admin` (role). Sensitive content is
+  server-rendered behind auth.
 
 ## Auth & access
 

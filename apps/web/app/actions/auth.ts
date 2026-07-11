@@ -17,7 +17,8 @@ import {
 export type AuthActionState = { error?: string; success?: string };
 
 const siteUrl = getSiteUrl();
-const emailRedirectTo = `${siteUrl}/auth/callback?next=/buy`;
+// New members land on the dashboard — Agent 1 is free before they pay.
+const emailRedirectTo = `${siteUrl}/auth/callback?next=/dashboard`;
 
 function normalizeUsername(raw: string): string {
   return raw.trim().replace(/^@/, "").toLowerCase().replace(/[^a-z0-9_]/g, "");

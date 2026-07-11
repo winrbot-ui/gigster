@@ -29,6 +29,7 @@ function showLogin() {
   $("login-view").classList.remove("hidden");
   $("draft-panel").classList.add("hidden");
   $("brief-choice-panel").classList.add("hidden");
+  $("brief-lock-panel").classList.add("hidden");
 }
 
 function setStatus(text) {
@@ -51,11 +52,18 @@ function showDraft(data) {
 
 function updateBriefChoice(data) {
   const panel = $("brief-choice-panel");
-  if (!data?.project_id || !data?.readiness?.ready || data?.brief_decision) {
+  const lock = $("brief-lock-panel");
+  const ready = Boolean(data?.project_id && data?.readiness?.ready);
+
+  // Deal closed but no active membership → paywall, hide the free choices.
+  if (ready && data?.payment_required) {
     panel.classList.add("hidden");
+    lock.classList.remove("hidden");
     return;
   }
-  if (data.awaiting_brief_decision === false && data.brief_decision) {
+  lock.classList.add("hidden");
+
+  if (!ready || data?.brief_decision) {
     panel.classList.add("hidden");
     return;
   }

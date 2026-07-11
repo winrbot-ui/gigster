@@ -15,7 +15,7 @@ export default async function VerifyPage({
   const params = await searchParams;
   const user = await getCurrentUser();
 
-  if (user?.status === "active") {
+  if (user?.status === "active" || user?.status === "free") {
     redirect("/dashboard");
   }
   if (user?.status === "pending_payment") {

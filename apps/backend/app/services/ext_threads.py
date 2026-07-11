@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import re
+from datetime import datetime, timezone
 
 from postgrest.exceptions import APIError
 
@@ -309,6 +310,45 @@ def get_or_create_project(
     raise RuntimeError("Failed to create project")
 
 
+def resolve_payment_state(sb, user_id: str, *, deal_ready: bool) -> bool:
+    """Return whether the paid payoff is locked for this member.
+
+    Freemium rule: Agent 1 drafting is free, but the first concluded deal flips
+    the member into "must pay" mode. Admins and members with an active
+    subscription are never locked. Records the first deal so the web profile can
+    prompt for payment.
+    """
+    membership = (
+        first_row(
+            sb.table("users")
+            .select("status, role, has_reached_deal")
+            .eq("id", user_id)
+            .limit(1)
+            .execute()
+        )
+        or {}
+    )
+    if membership.get("role") == "admin" or membership.get("status") == "active":
+        return False
+
+    has_reached_deal = bool(membership.get("has_reached_deal"))
+    if deal_ready and not has_reached_deal:
+        try:
+            sb.table("users").update(
+                {
+                    "has_reached_deal": True,
+                    "first_deal_at": datetime.now(timezone.utc).isoformat(),
+                }
+            ).eq("id", user_id).execute()
+            has_reached_deal = True
+        except APIError:
+            logger.warning(
+                "could not flag has_reached_deal — run migration 20260710000009_free_tier.sql"
+            )
+
+    return has_reached_deal
+
+
 async def process_thread(sb, user_id: str, body: dict) -> dict:
     platform = str(body.get("platform", "")).strip().lower()
     thread_id = str(body.get("thread_id", "")).strip()
@@ -382,6 +422,10 @@ async def process_thread(sb, user_id: str, body: dict) -> dict:
         }
     ).eq("id", project_id).execute()
 
+    readiness = ai.brief_readiness_details(updated, score)
+    # Free until the first concluded deal; then lock the paid payoff.
+    payment_required = resolve_payment_state(sb, user_id, deal_ready=readiness["ready"])
+
     if sync_only:
         return {
             "synced": True,
@@ -391,6 +435,8 @@ async def process_thread(sb, user_id: str, body: dict) -> dict:
             "project_json": updated,
             "message_count": len(all_messages),
             "messages_inserted": inserted,
+            "readiness": readiness,
+            "payment_required": payment_required,
         }
 
     persona = (
@@ -405,7 +451,6 @@ async def process_thread(sb, user_id: str, body: dict) -> dict:
     )
 
     draft_text, draft_mode = await ai.draft(persona, updated, inbox_text)
-    readiness = ai.brief_readiness_details(updated, score)
 
     last_incoming = messages[-1] if messages else None
     if (
@@ -433,6 +478,8 @@ async def process_thread(sb, user_id: str, body: dict) -> dict:
         "messages_inserted": inserted,
         "agent2": agent2_result,
         "is_new_project": is_new_project,
+        "payment_required": payment_required,
         "awaiting_brief_decision": readiness["ready"]
+        and not payment_required
         and not (updated.get("brief_decision") or existing_json.get("brief_decision")),
     }

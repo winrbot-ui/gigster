@@ -27,6 +27,10 @@ export interface UserRow {
   created_at: string;
   email_verified_at: string | null;
   signup_ip: string | null;
+  /** Set once the member closes their first deal — triggers the payment prompt. */
+  has_reached_deal: boolean;
+  /** Timestamp of the first concluded deal (brief ready), or null. */
+  first_deal_at: string | null;
 }
 
 export interface AgentPersonaRow extends AgentPersona {

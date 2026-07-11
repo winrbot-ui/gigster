@@ -9,6 +9,10 @@ import {
 
 const faqs = [
   {
+    q: "Is Gigster free?",
+    a: "Agent 1 (drafting client replies in your persona) is free — sign in, install the extension, and draft replies at no cost. Once you close your first deal, activate a membership ($200 Basic / $300 Pro, 30 days) to unlock the client brief document and the Agent 2 preview site.",
+  },
+  {
     q: "Which platforms are supported?",
     a: "Fiverr and Freelancer are live. Upwork is coming soon — your Pro plan will include it at no extra cost when it ships.",
   },

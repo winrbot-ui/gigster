@@ -38,6 +38,31 @@ export async function requireRole(...roles: UserRole[]): Promise<UserRow> {
   return user;
 }
 
+/**
+ * Require a member allowed into the app. Agent 1 (drafting, persona, projects)
+ * is free, so `free` and `pending_payment` members are let in. Only the paid
+ * payoff (brief document, Agent 2) uses `requireActive`. Admins bypass.
+ */
+export async function requireMember(): Promise<UserRow> {
+  const user = await requireUser();
+  if (user.role === "admin") return user;
+
+  if (user.status === "pending_email") redirect("/verify");
+  if (user.status === "blocked") redirect("/login?error=blocked");
+  if (user.status === "expired") redirect("/buy");
+
+  if (user.status === "active") {
+    await expireStaleMembership(user.id);
+    const refreshed = await getCurrentUser();
+    if (!refreshed) redirect("/login");
+    if (refreshed.status === "expired") redirect("/buy");
+    return refreshed;
+  }
+
+  // free or pending_payment — Agent 1 is free, so allow into the app.
+  return user;
+}
+
 /** Require an active subscription (used by the closed app group). Admins bypass. */
 export async function requireActive(): Promise<UserRow> {
   const user = await requireUser();

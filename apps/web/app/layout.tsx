@@ -18,8 +18,8 @@ export const metadata: Metadata = {
     template: "%s · Gigster",
   },
   description:
-    "An invite-only club for freelancers. Your AI persona drafts client replies and builds the sites you sell.",
-  metadataBase: new URL("https://gigster.website"),
+    "Invite-only AI agent extension — talks to clients, creates the work, and finishes the project on Fiverr and Freelancer.",
+  metadataBase: new URL("https://www.gigster.website"),
 };
 
 export default function RootLayout({
@@ -32,7 +32,10 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full`}
     >
-      <body className="min-h-full bg-background text-foreground">
+      <body
+        className="min-h-full bg-background text-foreground"
+        suppressHydrationWarning
+      >
         {children}
       </body>
     </html>

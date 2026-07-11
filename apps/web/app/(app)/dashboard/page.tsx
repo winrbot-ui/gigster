@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { requireActive } from "@/lib/auth";
+import { requireMember } from "@/lib/auth";
 import { getDashboardStats, getInviteStats } from "@/app/actions/dashboard";
 import { getPersona } from "@/app/actions/persona";
 import { buildInviteLink } from "@/lib/invites";
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function DashboardPage() {
-  const user = await requireActive();
+  const user = await requireMember();
   const [stats, invite, persona] = await Promise.all([
     getDashboardStats(user.id),
     getInviteStats(user.id),
