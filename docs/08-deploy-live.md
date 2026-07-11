@@ -87,8 +87,10 @@ Run all SQL files in order (SQL Editor → New query → paste → Run):
 SUPABASE_URL=https://....supabase.co
 SUPABASE_SERVICE_ROLE_KEY=...
 SUPABASE_JWT_SECRET=...
+SUPABASE_ANON_KEY=...          (extension login — same as Vercel NEXT_PUBLIC_SUPABASE_ANON_KEY)
 ANTHROPIC_API_KEY=...
 CORS_ORIGINS=https://www.gigster.website,https://gigster.website
+CORS_EXTENSION_IDS=...         (Chrome extension ID(s), comma-separated — see section 13)
 TELEGRAM_BOT_TOKEN=...
 TELEGRAM_WEBHOOK_SECRET=...   (or reuse CRON_SECRET)
 RESEND_API_KEY=...
@@ -145,6 +147,46 @@ Separate Vercel project + wildcard `*.gigsterr.online`. Not needed until Agent 2
 - `https://www.gigster.website` — landing loads
 - `/join` — invite gate
 - Signup flow — email verify redirects work (Supabase URLs above)
+- `https://gigsterbackend-production.up.railway.app/health` — `{"status":"ok","service":"gigster-api"}`
+
+## 13. Chrome extensions (production + Web Store)
+
+### Build production zips (from repo root)
+
+```bash
+npm run build:extension:store
+```
+
+Creates:
+
+- `release/gigster-fiverr.zip`
+- `release/gigster-freelancer.zip`
+
+Each zip contains `dist/` with production `apiBase` → Railway URL and updated `host_permissions`.
+
+### Chrome Web Store (one-time)
+
+1. https://chrome.google.com/webstore/devconsole — pay **$5** developer fee
+2. **New item** → upload `release/gigster-fiverr.zip` (repeat for freelancer)
+3. Listing: name, description, screenshots (1280×800), category **Productivity**
+4. **Privacy policy URL:** `https://www.gigster.website/tos`
+5. Submit for review (typically 1–7 days)
+
+### Extension ID → Railway CORS
+
+After **Load unpacked** (beta) or **Web Store publish**, open `chrome://extensions` → copy **ID** (32 chars).
+
+Railway → `@gigster/backend` → **Variables**:
+
+```
+CORS_EXTENSION_IDS=abc123...fiverr,def456...freelancer
+```
+
+Redeploy backend. Without this, extension API calls are blocked by CORS.
+
+### Beta without Web Store
+
+Chrome → Extensions → Developer mode → **Load unpacked** → `apps/extension-fiverr/dist` (after `npm run build:extension:prod`).
 
 ## Local dev
 

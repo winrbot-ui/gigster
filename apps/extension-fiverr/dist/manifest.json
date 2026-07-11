@@ -8,7 +8,8 @@
     "https://www.fiverr.com/*",
     "https://fiverr.com/*",
     "http://localhost:8000/*",
-    "https://*.gigster.website/*"
+    "https://*.gigster.website/*",
+    "https://gigsterbackend-production.up.railway.app/*"
   ],
   "background": {
     "service_worker": "src/background/service-worker.js",

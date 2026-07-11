@@ -51,6 +51,7 @@ yarn-error.log*
 .env*
 !**/.env.example
 apps/extension-*/src/config.local.js
+release/
 backup/
 
 # vercel

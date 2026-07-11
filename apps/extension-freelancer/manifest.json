@@ -8,7 +8,8 @@
     "https://www.freelancer.com/*",
     "https://www.freelancer.com.au/*",
     "http://localhost:8000/*",
-    "https://*.gigster.website/*"
+    "https://*.gigster.website/*",
+    "https://gigsterbackend-production.up.railway.app/*"
   ],
   "background": {
     "service_worker": "src/background/service-worker.js",
