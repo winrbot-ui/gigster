@@ -73,7 +73,11 @@ Run all SQL files in order (SQL Editor → New query → paste → Run):
 
 1. **railway.app** → New → **GitHub Repository** → `winrbot-ui/gigster`
 2. Service **Settings → Root Directory:** `apps/backend`
-3. **Variables** (not Vercel `NEXT_PUBLIC_*`):
+3. Service **Settings → Config file path:** `/apps/backend/railway.toml`  
+   (Railway does **not** auto-load config from Root Directory — this step is required.)
+4. Service **Settings → Build → Builder:** `Dockerfile` (not Nixpacks / npm)
+5. **Clear** any custom Start Command or Build Command on the service (Dockerfile `CMD` runs the API).
+6. **Variables** (not Vercel `NEXT_PUBLIC_*`):
 
 ```
 SUPABASE_URL=https://....supabase.co
