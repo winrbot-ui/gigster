@@ -159,6 +159,8 @@ npm run build:extension:store
 
 **Listing copy, icon, screenshot:** see `docs/chrome-store-CHECKLIST.md` and `docs/chrome-store-fiverr-listing.md`.
 
+**Privacy practices (Unable to publish fixes):** `docs/chrome-store-privacy-paste.md`
+
 Creates:
 
 - `release/gigster-fiverr.zip`

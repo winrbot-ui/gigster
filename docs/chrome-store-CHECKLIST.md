@@ -1,19 +1,30 @@
-# Chrome Web Store — quick checklist (Fiverr)
+# Chrome Web Store — Fiverr submit checklist
 
-Open: `docs/chrome-store-fiverr-listing.md` for full copy-paste text.
+**“Unable to publish”?** Open `docs/chrome-store-privacy-paste.md` and paste every block.
 
-## Files to upload
+## Order (do not skip)
 
-| What | Path |
-|------|------|
-| ZIP | `release/gigster-fiverr.zip` (run `npm run build:extension:store`) |
-| Icon 128×128 | `apps/extension-fiverr/store-assets/icon128.png` |
+| Step | Where | What |
+|------|--------|------|
+| 1 | **Privacy practices** | Paste all justifications from `chrome-store-privacy-paste.md` |
+| 2 | **Privacy practices** | Check data usage certification box |
+| 3 | **Account → Settings** | Add contact email + **verify** via inbox link |
+| 4 | **Store listing** | Summary, description, icon, screenshot 1280×800 |
+| 5 | **Distribution** | Public (or Unlisted) |
+| 6 | **Save draft** → **Submit for review** |
+
+## Files
+
+| Asset | Path |
+|-------|------|
+| ZIP | `release/gigster-fiverr.zip` |
+| Icon | `apps/extension-fiverr/store-assets/icon128.png` |
 | Screenshot | `apps/extension-fiverr/store-assets/screenshot-1280x800.png` |
 
-## 5 clicks
+## Listing copy
 
-1. **Store listing** — paste Summary + Description from doc; Category **Productivity**; Language **English**
-2. Upload **icon** + **screenshot**
-3. **Privacy practices** — policy URL: `https://www.gigster.website/tos`
-4. **Distribution** — Public
-5. **Submit for review**
+`docs/chrome-store-fiverr-listing.md` (Summary + Description)
+
+## Railway after approve
+
+`CORS_EXTENSION_IDS=bmekdhfojkicjmcnbackggnnggbidlbe`

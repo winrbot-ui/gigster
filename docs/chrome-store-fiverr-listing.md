@@ -26,8 +26,8 @@ AI drafts Fiverr client replies in your voice. Free until your first deal — me
 Gigster drafts every Fiverr client reply in your voice — so you can focus on closing deals, not typing.
 
 • Agent 1 writes on-brand replies from your inbox
-• Manual mode: you review and send
-• Auto mode: optional auto-send (use carefully)
+• Manual mode: you review and send each draft (default)
+• Optional Auto mode: opt-in only, with ban-risk disclaimer
 • Tracks negotiation and brief readiness
 • Free until your first closed client
 
@@ -68,25 +68,24 @@ C:\Users\kosta\Desktop\gigster_website\apps\extension-fiverr\store-assets\screen
 
 ## Privacy practices tab
 
+**Full copy-paste for all required fields:** `docs/chrome-store-privacy-paste.md`
+
 | Question | Answer |
 |----------|--------|
-| **Single purpose** | Draft AI replies for Fiverr seller inbox messages on behalf of the logged-in Gigster member. |
+| **Single purpose** | See privacy-paste doc (block: Single purpose) |
 | **Privacy policy URL** | `https://www.gigster.website/tos` |
-| **Uses remote code?** | No (extension calls Gigster API; no arbitrary remote scripts). |
-| **Data collected** | Account credentials (login), inbox message text sent to Gigster API for drafting, extension settings stored locally. |
-| **Data use** | To authenticate the member and generate reply drafts via Gigster backend. |
-| **Data shared** | Message text is sent to Gigster servers (Railway API) for AI processing — not sold to third parties. |
+| **Remote code** | No — see privacy-paste doc |
+| **Data certification** | Check the compliance checkbox |
 
-If Google shows permission justification forms:
+Permission justifications (storage, tabs, scripting, alarms, host permission) — all in `chrome-store-privacy-paste.md`.
 
-| Permission | Justification |
-|------------|----------------|
-| `storage` | Save login session and extension preferences. |
-| `tabs` | Detect when member is on Fiverr inbox. |
-| `scripting` | Read inbox message text to send drafts to Gigster API. |
-| `alarms` | Background polling for new messages in Auto mode. |
-| `host_permissions` (fiverr.com) | Operate on Fiverr inbox pages only. |
-| `host_permissions` (gigster API) | Connect to Gigster backend for auth and AI drafts. |
+---
+
+## Account Settings (required for Submit)
+
+1. **Account** → **Settings** → add **contact email**
+2. Verify via link in inbox
+3. Without verified email, **Submit for review** stays disabled
 
 ---
 
