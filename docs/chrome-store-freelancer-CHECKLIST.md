@@ -15,7 +15,7 @@ Copy from: `docs/chrome-store-freelancer-listing.md`
 | Asset | Path |
 |-------|------|
 | Icon | `apps/extension-freelancer/store-assets/icon128.png` |
-| Screenshot | `apps/extension-freelancer/store-assets/screenshot-1280x800.png` |
+| Screenshot | `release/store-upload/gigster-freelancer-screenshot-1280x800.png` |
 
 ## 3. Privacy practices
 

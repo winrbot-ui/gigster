@@ -54,9 +54,15 @@ C:\Users\kosta\Desktop\gigster_website\apps\extension-freelancer\store-assets\ic
 
 ### Screenshot (1280×800 required)
 
+Upload **only** from `release/store-upload/` (exact dimensions verified):
+
 ```
-C:\Users\kosta\Desktop\gigster_website\apps\extension-freelancer\store-assets\screenshot-1280x800.png
+C:\Users\kosta\Desktop\gigster_website\release\store-upload\gigster-freelancer-screenshot-1280x800.png
 ```
+
+If that fails, try the 640×400 file in the same folder.
+
+Regenerate: `npm run build:extension:store`
 
 ### Additional fields
 

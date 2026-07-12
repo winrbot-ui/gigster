@@ -53,3 +53,5 @@ console.log("\nDone. Upload zips from release/ to Chrome Web Store Developer Das
 console.log("Note: Store zips omit manifest.key — Google assigns the extension ID after publish.");
 console.log("After publish, add the new ID(s) to Railway CORS_EXTENSION_IDS.");
 console.log("Dev Load unpacked IDs (with key):", keys.railway.CORS_EXTENSION_IDS);
+execSync("python scripts/resize-store-screenshots.py", { cwd: root, stdio: "inherit" });
+execSync("python scripts/export-store-upload.py", { cwd: root, stdio: "inherit" });
