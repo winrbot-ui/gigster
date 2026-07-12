@@ -1,4 +1,4 @@
-# Chrome Web Store — Privacy practices (COPY-PASTE)
+# Chrome Web Store — Fiverr Privacy practices (COPY-PASTE)
 
 Open: **Gigster Fiverr** → left sidebar → **Privacy practices**
 

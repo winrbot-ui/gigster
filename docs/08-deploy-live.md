@@ -157,9 +157,9 @@ Separate Vercel project + wildcard `*.gigsterr.online`. Not needed until Agent 2
 npm run build:extension:store
 ```
 
-**Listing copy, icon, screenshot:** see `docs/chrome-store-CHECKLIST.md` and `docs/chrome-store-fiverr-listing.md`.
+**Fiverr:** `docs/chrome-store-CHECKLIST.md`, `docs/chrome-store-fiverr-listing.md`, `docs/chrome-store-privacy-paste.md`
 
-**Privacy practices (Unable to publish fixes):** `docs/chrome-store-privacy-paste.md`
+**Freelancer:** `docs/chrome-store-freelancer-CHECKLIST.md`, `docs/chrome-store-freelancer-listing.md`, `docs/chrome-store-freelancer-privacy-paste.md`
 
 Creates:
 
