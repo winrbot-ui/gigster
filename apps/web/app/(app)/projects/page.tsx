@@ -6,7 +6,7 @@ import { ProjectsView } from "@/components/app/projects-view";
 import type { ProjectRow } from "@gigster/shared-types";
 
 export const metadata: Metadata = {
-  title: "Projects",
+  title: "Clients",
 };
 
 export default async function ProjectsPage() {

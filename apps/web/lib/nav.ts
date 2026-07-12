@@ -5,10 +5,10 @@ import type { NavItem } from "@/components/app/app-nav";
 export function buildMemberNav(user: UserRow): NavItem[] {
   const nav: NavItem[] = [
     { href: "/dashboard", label: "Dashboard" },
-    { href: "/projects", label: "Projects" },
+    { href: "/projects", label: "Clients" },
     { href: "/agent-setup", label: "Agent setup" },
     { href: "/guide", label: "Guide" },
-    { href: "/settings", label: "Settings" },
+    { href: "/settings", label: "Profile" },
   ];
 
   if (user.status !== "active" && user.role !== "admin") {

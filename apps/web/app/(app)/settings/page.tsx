@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { requireUser } from "@/lib/auth";
+import { getUserSubscription } from "@/lib/subscription";
+import { getPersona } from "@/app/actions/persona";
 import { SettingsView } from "@/components/app/settings-view";
 
 export const metadata: Metadata = {
-  title: "Settings",
+  title: "Profile",
 };
 
 export default async function SettingsPage({
@@ -13,5 +15,16 @@ export default async function SettingsPage({
 }) {
   const user = await requireUser();
   const params = await searchParams;
-  return <SettingsView user={user} showResetHint={params.reset === "1"} />;
+  const [subscription, persona] = await Promise.all([
+    getUserSubscription(user.id),
+    getPersona(user.id),
+  ]);
+  return (
+    <SettingsView
+      user={user}
+      subscription={subscription}
+      persona={persona}
+      showResetHint={params.reset === "1"}
+    />
+  );
 }

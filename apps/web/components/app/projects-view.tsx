@@ -241,15 +241,17 @@ export function ProjectsView({
   return (
     <>
       <PageHeader
-        title="Projects"
-        description="Client conversations and the sites your AI builds from them."
+        title="Clients"
+        description="Every client your AI tracks — and the preview sites it builds when a deal is ready."
       />
 
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>New project</CardTitle>
+          <CardTitle>Add a client</CardTitle>
           <CardDescription>
-            Plan limit: {platformsAllowed} platform{platformsAllowed === 1 ? "" : "s"} · Used:{" "}
+            Usually the Chrome extension adds clients automatically from your inbox.
+            You can also add one manually here. Plan limit: {platformsAllowed} platform
+            {platformsAllowed === 1 ? "" : "s"} · Used:{" "}
             {usedPlatforms.length ? usedPlatforms.join(", ") : "none"}
           </CardDescription>
         </CardHeader>
@@ -304,10 +306,16 @@ export function ProjectsView({
 
       {projects.length === 0 ? (
         <Card>
-          <CardContent className="flex flex-col items-center gap-2 py-16 text-center">
-            <p className="text-sm font-medium">No projects yet</p>
-            <p className="max-w-sm text-sm text-muted">
-              Create a project manually or use the Chrome extension on Fiverr or Freelancer.
+          <CardContent className="flex flex-col items-center gap-3 py-16 text-center">
+            <p className="text-sm font-medium">No clients yet</p>
+            <p className="max-w-md text-sm text-muted">
+              This is where your clients appear. Install the Gigster Chrome extension,
+              open your Fiverr or Freelancer inbox, and press Start — each conversation
+              shows up here with its brief readiness and, once a deal is ready, the
+              preview site your AI builds.
+            </p>
+            <p className="max-w-md text-xs text-muted">
+              Or add a client manually using the form above.
             </p>
           </CardContent>
         </Card>

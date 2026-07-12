@@ -6,11 +6,12 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 const faqs = [
   {
     q: "Is Gigster free?",
-    a: "Agent 1 (drafting client replies in your persona) is free — sign in, install the extension, and draft replies at no cost. Once you close your first deal, activate a membership ($200 Basic / $300 Pro, 30 days) to unlock the client brief document and the Agent 2 preview site.",
+    a: "Yes — drafting client replies in your persona (Agent 1) is free. Sign in, install the extension, and draft replies at no cost. Once you close your first deal, activate a membership ($200 Basic / $300 Pro, 30 days) to unlock the client brief document and the Agent 2 preview site.",
   },
   {
     q: "Which platforms are supported?",
@@ -18,75 +19,130 @@ const faqs = [
   },
   {
     q: "Manual vs Auto mode?",
-    a: "Manual: Gigster drafts replies; you copy and send on the marketplace. Auto: the extension sends after a short delay. Auto requires accepting a ban-risk disclaimer and should be used carefully.",
+    a: "Manual (recommended): Gigster drafts each reply; you review, copy, and send it yourself on the marketplace. Auto: the extension sends the reply for you after a short delay. Auto requires accepting a ban-risk disclaimer and should be used carefully.",
   },
   {
-    q: "How do I install the extension?",
-    a: "Build with npm run build:extension:fiverr or build:extension:freelancer, then load the dist/ folder in Chrome → Extensions → Developer mode → Load unpacked.",
+    q: "Do I need a separate account for the extension?",
+    a: "No. Use the same @nickname or email and password as this dashboard to log in inside the extension popup.",
   },
   {
     q: "Why connect Telegram?",
-    a: "Telegram alerts you for new clients, brief-ready moments, and when Agent 2 finishes a preview site. Link it from Dashboard → notifications.",
+    a: "Telegram alerts you for new clients, brief-ready moments, and when Agent 2 finishes a preview site. Link it from the dashboard notifications.",
   },
   {
-    q: "What happens when the brief is ready?",
-    a: "The extension popup offers: build a preview site (Agent 2), download a client brief (PDF), or both. Agent 2 runs asynchronously — poll status in the popup or check Projects.",
+    q: "What happens when a client is ready to close?",
+    a: "When the brief is ready, the extension popup offers: build a preview site (Agent 2), download a client brief (PDF), or both. Agent 2 runs in the background — track status in the popup or on the Clients page.",
   },
 ];
+
+function Step({
+  n,
+  title,
+  children,
+}: {
+  n: number;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex gap-4">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/15 text-sm font-semibold text-accent-strong">
+        {n}
+      </div>
+      <div className="flex flex-col gap-1">
+        <p className="font-medium text-foreground">{title}</p>
+        <div className="text-sm text-muted">{children}</div>
+      </div>
+    </div>
+  );
+}
 
 export function GuideView() {
   return (
     <>
       <PageHeader
         title="Setup guide"
-        description="Install extensions, choose a mode, and connect Telegram."
+        description="Get the extension running in a few minutes."
       />
 
       <div className="flex flex-col gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>1. Install the Chrome extension</CardTitle>
-            <CardDescription>One extension per marketplace.</CardDescription>
+            <div className="flex flex-wrap items-center gap-2">
+              <CardTitle>1. Install the Chrome extension</CardTitle>
+              <Badge tone="accent">Coming to Chrome Web Store</Badge>
+            </div>
+            <CardDescription>One extension per marketplace — install the one you sell on.</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col gap-3 text-sm text-muted">
-            <p>
-              <strong className="text-foreground">Fiverr:</strong> run{" "}
-              <code className="rounded bg-surface-2 px-1">npm run build:extension:fiverr</code>,
-              load <code className="rounded bg-surface-2 px-1">apps/extension-fiverr/dist</code> in
-              Chrome.
+          <CardContent className="flex flex-col gap-4">
+            <p className="text-sm text-muted">
+              Our Fiverr and Freelancer extensions are in Chrome Web Store review.
+              As soon as they are approved, install links appear here — one click,
+              no technical setup.
             </p>
-            <p>
-              <strong className="text-foreground">Freelancer:</strong> run{" "}
-              <code className="rounded bg-surface-2 px-1">npm run build:extension:freelancer</code>,
-              load <code className="rounded bg-surface-2 px-1">apps/extension-freelancer/dist</code>.
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-lg border border-border bg-surface-2/50 p-4">
+                <p className="text-sm font-medium text-foreground">Gigster for Fiverr</p>
+                <p className="text-sm text-muted">Chrome Web Store link — available after approval.</p>
+              </div>
+              <div className="rounded-lg border border-border bg-surface-2/50 p-4">
+                <p className="text-sm font-medium text-foreground">Gigster for Freelancer</p>
+                <p className="text-sm text-muted">Chrome Web Store link — available after approval.</p>
+              </div>
+            </div>
+            <p className="text-sm text-muted">
+              Tip: after installing, click the puzzle icon in Chrome&apos;s toolbar
+              and pin Gigster so the popup is always one click away.
             </p>
-            <p>Log in with the same @nickname or email as the web dashboard.</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>2. Manual vs Auto</CardTitle>
+            <CardTitle>2. Start drafting</CardTitle>
+            <CardDescription>Same login as this dashboard.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <Step n={1} title="Log in inside the extension">
+              Open the Gigster popup and sign in with the same{" "}
+              <span className="text-foreground">@nickname or email</span> and password
+              you use here.
+            </Step>
+            <Step n={2} title="Open your marketplace inbox">
+              Go to your Fiverr or Freelancer inbox in the same browser.
+            </Step>
+            <Step n={3} title="Press Start">
+              In the popup, choose a mode and press{" "}
+              <span className="text-foreground">Start</span>. Gigster reads the open
+              conversation and drafts a reply in your persona.
+            </Step>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>3. Manual vs Auto</CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-muted">
             <p className="mb-2">
-              <strong className="text-foreground">Manual (recommended):</strong> open inbox,
-              press Start — Gigster drafts each reply; you copy and send on the platform.
+              <strong className="text-foreground">Manual (recommended):</strong> Gigster
+              drafts each reply; you review, copy, and send it yourself on the platform.
             </p>
             <p>
-              <strong className="text-foreground">Auto:</strong> extension sends replies for you.
-              Accept the disclaimer first. Long-term Auto use may risk marketplace bans.
+              <strong className="text-foreground">Auto:</strong> the extension sends
+              replies for you. Accept the disclaimer first — long-term Auto use may risk
+              marketplace bans.
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>3. Connect Telegram</CardTitle>
+            <CardTitle>4. Connect Telegram (optional)</CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-muted">
-            From the dashboard, open Telegram linking and send the bot your link code. You&apos;ll
-            get alerts for new clients, brief ready, and preview URLs.
+            Link Telegram to get alerts for new clients, brief-ready moments, and
+            preview site URLs — so you never miss a hot lead.
           </CardContent>
         </Card>
 
