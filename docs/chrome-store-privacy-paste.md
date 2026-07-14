@@ -9,7 +9,7 @@ Paste each block into the matching field. All text is English (required by Googl
 ## Privacy policy URL
 
 ```
-https://www.gigster.website/tos
+https://www.gigster.website/privacy
 ```
 
 ---
@@ -117,7 +117,7 @@ bmekdhfojkicjmcnbackggnnggbidlbe
 After approval, Railway → `@gigster/backend` → **Variables**:
 
 ```
-CORS_EXTENSION_IDS=bmekdhfojkicjmcnbackggnnggbidlbe
+CORS_EXTENSION_IDS=bmekdhfojkicjmcnbackggnnggbidlbe,ckhdlpfhjhnhlehofdlcaclipfadldef
 ```
 
 (Add dev ID comma-separated if you still use Load unpacked:  

@@ -164,13 +164,37 @@ export function SettingsView({
                 </>
               ) : (
                 <>
+                  <div className="flex items-center gap-2">
+                    <Badge tone="success">Free tier</Badge>
+                    <span className="text-muted">No payment needed yet.</span>
+                  </div>
                   <p className="text-muted">
-                    You are on the free tier — draft unlimited client replies at no
-                    cost. Membership activates after your first closed deal.
+                    Draft unlimited client replies with Agent 1 at no cost. You only
+                    pay when it pays off — after your first closed deal you activate a
+                    plan to unlock the client brief (PDF) and Agent 2 preview site.
                   </p>
-                  <Link href="/buy" className={buttonClasses("secondary", "sm")}>
-                    View plans
-                  </Link>
+                  <ol className="flex flex-col gap-1.5 text-muted">
+                    <li>
+                      <span className="text-accent-strong">1.</span> Install the
+                      extension &amp; set your persona — free.
+                    </li>
+                    <li>
+                      <span className="text-accent-strong">2.</span> Agent 1 drafts
+                      every reply and closes the deal.
+                    </li>
+                    <li>
+                      <span className="text-accent-strong">3.</span> Deal closed →
+                      activate a plan to deliver the brief &amp; site.
+                    </li>
+                  </ol>
+                  <div className="flex flex-wrap gap-2">
+                    <Link href="/guide" className={buttonClasses("primary", "sm")}>
+                      Install the extension
+                    </Link>
+                    <Link href="/buy" className={buttonClasses("secondary", "sm")}>
+                      View plans
+                    </Link>
+                  </div>
                 </>
               )}
             </CardContent>

@@ -33,8 +33,13 @@ for (const { app, zip } of extensions) {
   const manifestPath = join(dist, "manifest.json");
   const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
   delete manifest.key;
+  if (Array.isArray(manifest.host_permissions)) {
+    manifest.host_permissions = manifest.host_permissions.filter(
+      (h) => !/^https?:\/\/localhost/i.test(h),
+    );
+  }
   writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
-  console.log("  stripped manifest.key for Web Store");
+  console.log("  stripped manifest.key + localhost host_permissions for Web Store");
 
   mkdirSync(releaseDir, { recursive: true });
   const zipPath = join(releaseDir, zip);

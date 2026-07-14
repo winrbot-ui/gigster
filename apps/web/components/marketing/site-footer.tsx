@@ -13,6 +13,9 @@ export function SiteFooter() {
           </p>
         </div>
         <nav className="flex flex-wrap gap-x-8 gap-y-3 text-sm text-muted">
+          <Link href="/privacy" className="hover:text-foreground">
+            Privacy
+          </Link>
           <Link href="/tos" className="hover:text-foreground">
             Terms
           </Link>

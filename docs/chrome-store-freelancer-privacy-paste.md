@@ -7,7 +7,7 @@ Open: **Gigster Freelancer** → left sidebar → **Privacy practices**
 ## Privacy policy URL
 
 ```
-https://www.gigster.website/tos
+https://www.gigster.website/privacy
 ```
 
 ---
@@ -103,7 +103,7 @@ Check **all three** certification boxes at the bottom (“You must certify all t
 Add Freelancer **Item ID** to `CORS_EXTENSION_IDS` alongside Fiverr:
 
 ```
-CORS_EXTENSION_IDS=bmekdhfojkicjmcnbackggnnggbidlbe,FREELANCER_ITEM_ID_HERE
+CORS_EXTENSION_IDS=bmekdhfojkicjmcnbackggnnggbidlbe,ckhdlpfhjhnhlehofdlcaclipfadldef
 ```
 
 Redeploy `@gigster/backend`.

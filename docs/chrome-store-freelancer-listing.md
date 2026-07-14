@@ -87,7 +87,7 @@ Regenerate: `npm run build:extension:store`
 
 **Certifications:** check **all 3** boxes.
 
-**Privacy policy URL:** `https://www.gigster.website/tos`
+**Privacy policy URL:** `https://www.gigster.website/privacy`
 
 ---
 
@@ -114,7 +114,7 @@ Contact email must be **added and verified** (same publisher account as Fiverr �
 Copy **Item ID** from the Freelancer listing page, then Railway → `@gigster/backend` → **Variables**:
 
 ```
-CORS_EXTENSION_IDS=bmekdhfojkicjmcnbackggnnggbidlbe,YOUR_FREELANCER_ITEM_ID
+CORS_EXTENSION_IDS=bmekdhfojkicjmcnbackggnnggbidlbe,ckhdlpfhjhnhlehofdlcaclipfadldef
 ```
 
 (Keep Fiverr Store ID + add Freelancer Store ID, comma-separated.)

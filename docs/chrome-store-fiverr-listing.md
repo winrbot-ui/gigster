@@ -73,7 +73,7 @@ C:\Users\kosta\Desktop\gigster_website\apps\extension-fiverr\store-assets\screen
 | Question | Answer |
 |----------|--------|
 | **Single purpose** | See privacy-paste doc (block: Single purpose) |
-| **Privacy policy URL** | `https://www.gigster.website/tos` |
+| **Privacy policy URL** | `https://www.gigster.website/privacy` |
 | **Remote code** | No — see privacy-paste doc |
 | **Data certification** | Check the compliance checkbox |
 

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Container } from "@/components/ui/container";
 
 export const metadata: Metadata = {
@@ -13,7 +14,11 @@ export default function TosPage() {
           Terms of Service
         </h1>
         <p className="mt-4 text-sm text-muted">
-          Placeholder terms. The full agreement is added before launch.
+          Gigster is an invite-only club for freelancers. See our{" "}
+          <Link href="/privacy" className="text-accent-strong hover:underline">
+            Privacy Policy
+          </Link>{" "}
+          for how we handle your data.
         </p>
         <div className="mt-8 flex flex-col gap-6 text-sm leading-relaxed text-muted">
           <section>
@@ -22,7 +27,10 @@ export default function TosPage() {
             </h2>
             <p className="mt-2">
               Gigster is an invite-only service. Access requires a valid invite
-              and an active subscription.
+              and a Gigster account. Agent 1 (AI reply drafting) is free after
+              email verification. Paid membership is required to unlock the
+              client brief document and Agent 2 preview sites after your first
+              closed deal.
             </p>
           </section>
           <section>
@@ -31,7 +39,9 @@ export default function TosPage() {
             </h2>
             <p className="mt-2">
               You are responsible for how you use AI-generated drafts and builds
-              with your clients.
+              with your clients. You must comply with each marketplace&apos;s
+              terms (Fiverr, Freelancer, etc.). Auto-send mode is optional and
+              used at your own risk.
             </p>
           </section>
           <section>
@@ -39,8 +49,8 @@ export default function TosPage() {
               3. Payments
             </h2>
             <p className="mt-2">
-              Memberships are paid in USDT (TRC-20) and verified manually. Terms
-              are non-refundable once a period begins.
+              Paid memberships are billed in USDT (TRC-20) and verified manually.
+              Plans are non-refundable once a subscription period begins.
             </p>
           </section>
         </div>

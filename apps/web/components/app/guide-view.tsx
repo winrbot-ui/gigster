@@ -62,32 +62,52 @@ export function GuideView() {
     <>
       <PageHeader
         title="Setup guide"
-        description="Get the extension running in a few minutes."
+        description="Install free and start drafting in a few minutes — no card required."
       />
 
       <div className="flex flex-col gap-6">
+        <Card className="border-accent/25 bg-accent/5">
+          <CardContent className="flex flex-col gap-1 py-5">
+            <p className="text-sm font-medium text-foreground">
+              Everything here is free to set up.
+            </p>
+            <p className="text-sm text-muted">
+              Installing the extension, setting your persona, and drafting client
+              replies with Agent 1 cost nothing. You only activate a paid plan after
+              you close your first deal — to unlock the client brief and preview site.
+            </p>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
             <div className="flex flex-wrap items-center gap-2">
               <CardTitle>1. Install the Chrome extension</CardTitle>
               <Badge tone="accent">Coming to Chrome Web Store</Badge>
             </div>
-            <CardDescription>One extension per marketplace — install the one you sell on.</CardDescription>
+            <CardDescription>One extension per marketplace — install the one you sell on. Free, no card.</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <p className="text-sm text-muted">
               Our Fiverr and Freelancer extensions are in Chrome Web Store review.
-              As soon as they are approved, install links appear here — one click,
-              no technical setup.
+              As soon as they are approved, a one-click{" "}
+              <span className="text-foreground">Add to Chrome</span> button appears
+              here — no technical setup. On Pro you can run both at once.
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-lg border border-border bg-surface-2/50 p-4">
-                <p className="text-sm font-medium text-foreground">Gigster for Fiverr</p>
-                <p className="text-sm text-muted">Chrome Web Store link — available after approval.</p>
+              <div className="flex flex-col gap-1 rounded-lg border border-border bg-surface-2/50 p-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-foreground">Gigster for Fiverr</p>
+                  <Badge tone="accent">In review</Badge>
+                </div>
+                <p className="text-sm text-muted">Add to Chrome link — available after approval.</p>
               </div>
-              <div className="rounded-lg border border-border bg-surface-2/50 p-4">
-                <p className="text-sm font-medium text-foreground">Gigster for Freelancer</p>
-                <p className="text-sm text-muted">Chrome Web Store link — available after approval.</p>
+              <div className="flex flex-col gap-1 rounded-lg border border-border bg-surface-2/50 p-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-foreground">Gigster for Freelancer</p>
+                  <Badge tone="accent">In review</Badge>
+                </div>
+                <p className="text-sm text-muted">Add to Chrome link — available after approval.</p>
               </div>
             </div>
             <p className="text-sm text-muted">

@@ -29,8 +29,9 @@ export function VerifyPanel({ email = "", error }: VerifyPanelProps) {
       <CardHeader>
         <CardTitle>Verify your email</CardTitle>
         <CardDescription>
-          We sent a verification link{email ? ` to ${email}` : ""}. Click it to
-          activate your account, then choose a membership plan.
+          We sent a verification link{email ? ` to ${email}` : ""}. Click it and
+          you&apos;re in — your account is free. Start drafting client replies with
+          Agent 1 right away; you only pay after you close your first deal.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-5">

@@ -174,7 +174,7 @@ After publish, update Railway `CORS_EXTENSION_IDS` with the Store-assigned exten
 1. https://chrome.google.com/webstore/devconsole — pay **$5** developer fee
 2. **New item** → upload `release/gigster-fiverr.zip` (repeat for freelancer)
 3. Listing: name, description, screenshots (1280×800), category **Productivity**
-4. **Privacy policy URL:** `https://www.gigster.website/tos`
+4. **Privacy policy URL:** `https://www.gigster.website/privacy`
 5. Submit for review (typically 1–7 days)
 
 ### Extension ID → Railway CORS
