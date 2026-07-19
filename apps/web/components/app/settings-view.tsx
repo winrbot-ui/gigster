@@ -112,8 +112,8 @@ export function SettingsView({
             <CardHeader>
               <CardTitle>Membership</CardTitle>
               <CardDescription>
-                Agent 1 drafting is always free. Paid membership unlocks the client
-                brief (PDF) and Agent 2 preview sites.
+                Reply drafting is always free. Paid membership unlocks the client
+                brief (PDF) and the project website built from your deal.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4 text-sm">
@@ -144,8 +144,8 @@ export function SettingsView({
               ) : needsPayment ? (
                 <>
                   <p className="text-muted">
-                    You closed your first deal. Activate a plan to unlock the brief
-                    document and Agent 2 preview site.
+                    You closed your first deal. Activate a plan and Gigster builds
+                    the project from it — the brief document and the client website.
                   </p>
                   <p className="text-muted">
                     Basic{" "}
@@ -169,9 +169,9 @@ export function SettingsView({
                     <span className="text-muted">No payment needed yet.</span>
                   </div>
                   <p className="text-muted">
-                    Draft unlimited client replies with Agent 1 at no cost. You only
-                    pay when it pays off — after your first closed deal you activate a
-                    plan to unlock the client brief (PDF) and Agent 2 preview site.
+                    Draft unlimited client replies at no cost. You only pay when it
+                    pays off — after your first closed deal you activate a plan to
+                    unlock the client brief (PDF) and the project website for that deal.
                   </p>
                   <ol className="flex flex-col gap-1.5 text-muted">
                     <li>
@@ -179,7 +179,7 @@ export function SettingsView({
                       extension &amp; set your persona — free.
                     </li>
                     <li>
-                      <span className="text-accent-strong">2.</span> Agent 1 drafts
+                      <span className="text-accent-strong">2.</span> Gigster drafts
                       every reply and closes the deal.
                     </li>
                     <li>
@@ -204,7 +204,7 @@ export function SettingsView({
             <CardHeader>
               <CardTitle>AI persona</CardTitle>
               <CardDescription>
-                The voice Agent 1 writes your client replies in.
+                The voice your client replies are written in.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-3 text-sm">

@@ -35,7 +35,7 @@ export function PersonaForm({ persona }: PersonaFormProps) {
         <CardHeader>
           <CardTitle>Persona</CardTitle>
           <CardDescription>
-            Agent 1 reads this from the database on every Generate — never cached.
+            Gigster reads this from the database on every Generate — never cached.
           </CardDescription>
         </CardHeader>
         <CardContent>

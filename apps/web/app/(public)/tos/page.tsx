@@ -27,9 +27,9 @@ export default function TosPage() {
             </h2>
             <p className="mt-2">
               Gigster is an invite-only service. Access requires a valid invite
-              and a Gigster account. Agent 1 (AI reply drafting) is free after
-              email verification. Paid membership is required to unlock the
-              client brief document and Agent 2 preview sites after your first
+              and a Gigster account. AI reply drafting is free after email
+              verification. Paid membership is required to unlock the client
+              brief document and the client project site after your first
               closed deal.
             </p>
           </section>

@@ -56,8 +56,8 @@ export function DashboardView({ user, stats, invite, inviteLink, persona }: Dash
               <Badge tone="accent">Payment required</Badge>
             </div>
             <CardDescription>
-              Agent 1 stays free for drafting replies. To unlock the client brief
-              document and the Agent 2 preview site for this deal, activate a plan.
+              Drafting stays free. To have Gigster build the project from this deal
+              — the client brief document and the client website — activate a plan.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
@@ -184,7 +184,7 @@ export function DashboardView({ user, stats, invite, inviteLink, persona }: Dash
           <CardHeader>
             <CardTitle>Agent persona</CardTitle>
             <CardDescription>
-              Agent 1 reads this live from the database on every Generate.
+              Gigster reads this live from the database on every Generate.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">

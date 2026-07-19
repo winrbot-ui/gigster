@@ -36,7 +36,7 @@ const steps = [
   {
     n: "01",
     title: "Install free",
-    body: "Get an invite, add the extension, set your persona. No card, no payment — Agent 1 drafts every client reply for free.",
+    body: "Get an invite, add the extension, set your persona. No card, no payment — every client reply gets drafted for you, free.",
   },
   {
     n: "02",
@@ -46,7 +46,7 @@ const steps = [
   {
     n: "03",
     title: "Pay only when you win",
-    body: "Deal closed? Activate membership to unlock the client brief and the Agent 2 preview site. You pay after you've already won.",
+    body: "Deal closed? Activate membership and Gigster builds the project from that deal — the client brief plus a working website, ready to deliver. You pay after you've already won.",
   },
 ];
 
@@ -59,9 +59,9 @@ const membershipPlans = [
     freeNote: "Free until your first client",
     afterNote: `Then $${PLAN_PRICE_USD.basic} / 30 days`,
     deliverables: [
-      "Agent 1 — drafts every client reply in your voice",
+      "Every client reply drafted in your voice",
       "Deal tracking + brief score, live",
-      "After first client: client brief (PDF) + Agent 2 preview sites",
+      "After first client: client brief (PDF) + the project website, built from your deal",
     ],
     cta: "Start free with invite",
     href: "/join",
@@ -130,7 +130,7 @@ export default function LandingPage() {
           >
             The Gigster extension drafts every client reply in your voice — Basic and Pro
             are both free until you close your first client. You only pay ($200 or $300)
-            when you want the client brief and the preview site for that deal.
+            when you want the client brief and the project website built from that deal.
           </p>
           <div
             className="animate-fade-up flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm font-medium text-muted"
@@ -179,7 +179,7 @@ export default function LandingPage() {
               Watch the extension close a deal
             </h2>
             <p className="max-w-xl text-muted">
-              A client writes. Agent 1 drafts in your voice — free. The deal locks, the
+              A client writes. Gigster drafts in your voice — free. The deal locks, the
               brief hits 92/100, and only then does Gigster ask you to pay. This is the
               exact flow, on loop.
             </p>
@@ -224,19 +224,20 @@ export default function LandingPage() {
             <Reveal delay={150} className="flex flex-col gap-6">
               <span className="text-sm font-medium text-accent">The fix</span>
               <p className="text-lg leading-relaxed text-muted">
-                Gigster is a Chrome extension with an AI agent that runs the whole
-                pipeline: it talks to clients in your voice, and once the deal is locked
-                it creates the deliverable — preview site, client brief, or both.
+                Gigster is a Chrome extension that runs the whole pipeline: it talks
+                to clients in your voice, and once the deal is locked it builds the
+                project from what was agreed — a working website, the client brief,
+                or both. The actual deliverable, not a mockup.
               </p>
               <div className="rounded-[var(--radius-card)] border border-accent/25 bg-accent/5 p-6">
                 <p className="text-base font-semibold text-accent-strong">
                   And the talking part costs you nothing.
                 </p>
                 <p className="mt-2 text-sm leading-relaxed text-muted">
-                  Agent 1 — the part that reads your inbox and drafts every reply — is
-                  free with an invite. No trial clock, no card. Gigster earns only when
-                  you do: after your first closed deal, membership unlocks the client
-                  brief and the Agent 2 preview site.
+                  The part that reads your inbox and drafts every reply is free with
+                  an invite. No trial clock, no card. Gigster earns only when you do:
+                  after your first closed deal, membership unlocks the client brief
+                  and the project website built from that deal.
                 </p>
               </div>
             </Reveal>
@@ -310,10 +311,10 @@ export default function LandingPage() {
                 </CardHeader>
                 <CardContent className="flex flex-col gap-4 text-sm">
                   <p className="text-muted">
-                    Basic and Pro both start free. When Agent 1 closes your first client,
+                    Basic and Pro both start free. When Gigster closes your first client,
                     activate the plan you chose — ${PLAN_PRICE_USD.basic} (Basic) or $
                     {PLAN_PRICE_USD.pro} (Pro) for 30 days — to unlock the client brief
-                    and preview site. Paid from a deal you already won.
+                    and the project website. Paid from a deal you already won.
                   </p>
                   <div className="rounded-lg border border-accent/20 bg-accent/5 p-4">
                     <p className="font-medium">The deal itself pays for it.</p>

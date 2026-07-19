@@ -66,7 +66,7 @@ export function BriefReadiness({ projectJson, briefScore, status }: BriefReadine
 
       {ready && (
         <p className="text-xs text-success">
-          All gates passed — you can generate the brief and queue Agent 2.
+          All gates passed — you can generate the brief and queue the site build.
         </p>
       )}
     </div>

@@ -129,7 +129,7 @@ export function ExtensionDemo() {
 
   const statusText =
     step === "typing1" || step === "typing2"
-      ? "Agent 1 is drafting…"
+      ? "Gigster is drafting…"
       : step === "draft1" || step === "draft2"
         ? "Writing in your voice…"
         : unlockReached
@@ -274,7 +274,7 @@ export function ExtensionDemo() {
                 </p>
                 <p className="mt-1 text-xs leading-relaxed text-muted">
                   Drafting stays free on Basic &amp; Pro. Unlock the client brief (PDF) and
-                  the Agent 2 preview site — from $200 after your first client.
+                  the project website built from this deal — from $200 after your first client.
                 </p>
                 <div className="mt-2.5 flex flex-wrap gap-2">
                   <span className="rounded-full bg-accent px-3 py-1 text-[11px] font-semibold text-accent-foreground">

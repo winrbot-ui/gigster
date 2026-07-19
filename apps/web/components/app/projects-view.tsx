@@ -37,7 +37,7 @@ const ALL_PLATFORMS = PLATFORM_CATALOG.map((p) => ({
 }));
 
 const BRIEF_ACTIONS: { action: BriefDecisionAction; label: string; variant: "primary" | "secondary" }[] = [
-  { action: "build", label: "Build site (Agent 2)", variant: "primary" },
+  { action: "build", label: "Build the project site", variant: "primary" },
   { action: "document", label: "Download client brief", variant: "secondary" },
   { action: "both", label: "Both", variant: "secondary" },
 ];
@@ -160,7 +160,7 @@ function ProjectCard({ project: p }: { project: ProjectRow }) {
         )}
 
         {p.agent2_status === "building" && (
-          <p className="text-sm text-muted">Agent 2 is building — refresh to check status.</p>
+          <p className="text-sm text-muted">Your project site is being built — refresh to check status.</p>
         )}
 
         {(pj?.brief_decision === "document" || pj?.brief_decision === "both") && (
@@ -187,7 +187,7 @@ function ProjectCard({ project: p }: { project: ProjectRow }) {
         <form action={slugAction}>
           <div className="flex flex-wrap items-end gap-2">
             <div className="flex flex-col gap-1">
-              <Label htmlFor={`slug-${p.id}`}>Preview slug</Label>
+              <Label htmlFor={`slug-${p.id}`}>Site address (slug)</Label>
               <Input
                 id={`slug-${p.id}`}
                 name="slug"
@@ -216,7 +216,7 @@ function ProjectCard({ project: p }: { project: ProjectRow }) {
         {(p.agent2_status === "failed" && p.build_spec) && (
           <form action={retryAction}>
             <Button type="submit" size="sm" variant="secondary" disabled={retryPending}>
-              {retryPending ? "Retrying…" : "Retry Agent 2 build"}
+              {retryPending ? "Retrying…" : "Retry site build"}
             </Button>
             {retryState.error && <p className="mt-1 text-sm text-danger">{retryState.error}</p>}
             {retryState.success && <p className="mt-1 text-sm text-success">{retryState.success}</p>}
@@ -242,7 +242,7 @@ export function ProjectsView({
     <>
       <PageHeader
         title="Clients"
-        description="Every client your AI tracks — and the preview sites it builds when a deal is ready."
+        description="Every client Gigster tracks — and the project sites it builds from each closed deal."
       />
 
       <Card className="mb-6">
@@ -311,8 +311,8 @@ export function ProjectsView({
             <p className="max-w-md text-sm text-muted">
               This is where your clients appear. Install the Gigster Chrome extension,
               open your Fiverr or Freelancer inbox, and press Start — each conversation
-              shows up here with its brief readiness and, once a deal is ready, the
-              preview site your AI builds.
+              shows up here with its brief readiness and, once a deal is closed, the
+              project site Gigster builds from it.
             </p>
             <p className="max-w-md text-xs text-muted">
               Or add a client manually using the form above.

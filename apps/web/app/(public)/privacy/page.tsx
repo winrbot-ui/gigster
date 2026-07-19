@@ -79,8 +79,8 @@ export default function PrivacyPage() {
               </span>{" "}
               Your agent persona settings (name, tone, specialty, rules) and
               structured project records (requirements, budget, deadlines, brief
-              scores) are stored in our database to power Agent 1 drafting and
-              Agent 2 site builds.
+              scores) are stored in our database to power reply drafting and
+              project site builds.
             </p>
             <p>
               <span className="font-medium text-foreground">
@@ -120,10 +120,10 @@ export default function PrivacyPage() {
             <ul className="list-disc space-y-2 pl-5">
               <li>Authenticate you on the website and in Chrome extensions.</li>
               <li>
-                Generate AI reply drafts in your configured persona (Agent 1).
+                Generate AI reply drafts in your configured persona.
               </li>
               <li>
-                Track client negotiations and produce brief documents and preview
+                Track client negotiations and produce brief documents and project
                 sites when you choose (paid features after membership activation).
               </li>
               <li>Operate subscriptions, payments verification, and support.</li>
@@ -139,9 +139,9 @@ export default function PrivacyPage() {
 
           <Section title="4. Chrome extensions (Fiverr and Freelancer)">
             <p>
-              The Gigster Chrome extensions are the primary way members use Agent
-              1. Each extension is limited to one marketplace and requests only
-              the permissions needed for its function:
+              The Gigster Chrome extensions are the primary way members use the
+              Service. Each extension is limited to one marketplace and requests
+              only the permissions needed for its function:
             </p>
             <ul className="list-disc space-y-2 pl-5">
               <li>
@@ -199,7 +199,7 @@ export default function PrivacyPage() {
               extension or public website bundle.
             </p>
             <p>
-              Agent 2 preview sites are deployed to *.gigsterr.online via Vercel.
+              Client project sites are deployed to *.gigsterr.online via Vercel.
               Those public sites contain only the client project content you
               approve for delivery, not your Gigster account credentials.
             </p>
@@ -224,7 +224,7 @@ export default function PrivacyPage() {
             <ul className="list-disc space-y-2 pl-5">
               <li>Supabase — authentication and database</li>
               <li>Railway — API hosting</li>
-              <li>Vercel — website and Agent 2 preview hosting</li>
+              <li>Vercel — website and client project site hosting</li>
               <li>Anthropic / OpenAI — AI drafting (server-side only)</li>
               <li>Resend — transactional email</li>
               <li>Telegram Bot API — optional notifications</li>

@@ -66,7 +66,7 @@ export async function updatePreviewSlug(
     .eq("id", projectId);
   if (error) return { error: error.message };
   revalidatePath("/projects");
-  return { success: "Preview slug updated." };
+  return { success: "Site address updated." };
 }
 
 export async function updatePreviewSlugAction(
@@ -122,7 +122,7 @@ export async function submitBriefDecisionAction(
     }
     revalidatePath("/projects");
     const labels: Record<BriefDecisionAction, string> = {
-      build: "Agent 2 build queued.",
+      build: "Project site build queued.",
       document: "Brief document ready — download from the project card.",
       both: "Build queued and brief document ready.",
     };
@@ -165,10 +165,10 @@ export async function retryAgent2Action(
     });
     if (!res.ok) {
       const body = (await res.json()) as { detail?: string };
-      return { error: body.detail ?? "Agent 2 retry failed." };
+      return { error: body.detail ?? "Site build retry failed." };
     }
     revalidatePath("/projects");
-    return { success: "Agent 2 rebuild started." };
+    return { success: "Site rebuild started." };
   } catch {
     return { error: "Backend unavailable." };
   }
