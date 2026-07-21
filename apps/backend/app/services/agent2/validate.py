@@ -2,33 +2,20 @@
 
 from __future__ import annotations
 
+import copy
 import re
 
-SECTION_KINDS = frozenset({
-    "hero", "services", "about_story", "team", "contact_form", "cta",
-    "faq", "pricing", "gallery", "testimonials", "menu", "embed", "blog_list",
-})
+from app.services.ai.capabilities import (
+    BLOCKER_PATTERNS,
+    BUILD_TEMPLATES,
+    SECTION_KINDS,
+    detect_blockers as _detect_blockers_from_text,
+)
 
-BUILD_TEMPLATES = frozenset({"business", "landing", "restaurant"})
-
-BLOCKER_PATTERNS = [
-    re.compile(p, re.I)
-    for p in (
-        r"\blogin\b",
-        r"\bsign[\s-]?up\b",
-        r"\bauth(entication)?\b",
-        r"\bdatabase\b",
-        r"\buser[\s-]?account",
-        r"\bpayment\b",
-        r"\bcheckout\b",
-        r"\be[\s-]?commerce\b",
-        r"\bshopping[\s-]?cart\b",
-        r"\breal[\s-]?time\b",
-        r"\bwebsocket\b",
-        r"\bcustom[\s-]?backend\b",
-        r"\bapi[\s-]?endpoint\b",
-    )
-]
+_CMS_REPLACE = re.compile(
+    r"\b(wordpress|wix|shopify|webflow|squarespace|framer)\b",
+    re.I,
+)
 
 
 def _validate_sections(sections: list, label: str) -> tuple[bool, str]:
@@ -57,22 +44,20 @@ def _iter_sections(spec: dict) -> list[dict]:
 
 
 def _collect_text(spec: dict) -> str:
+    """Collect metadata-only text for capability blockers.
+
+    Marketing copy inside sections (FAQ, features, tokenomics, etc.) is allowed
+    to mention industry terms. Blockers apply to site-level promises only.
+    """
     parts: list[str] = [
         str(spec.get("site_name") or ""),
         str(spec.get("tagline") or ""),
+        str(spec.get("summary") or ""),
     ]
     for page in spec.get("pages") or []:
         if isinstance(page, dict):
             parts.append(str(page.get("title") or ""))
             parts.append(str(page.get("slug") or ""))
-    for section in _iter_sections(spec):
-        if isinstance(section, dict):
-            parts.append(str(section.get("kind") or ""))
-            content = section.get("content")
-            if isinstance(content, dict):
-                parts.extend(str(v) for v in content.values())
-            elif content is not None:
-                parts.append(str(content))
     contact = spec.get("contact") or {}
     if isinstance(contact, dict):
         parts.extend(str(v) for v in contact.values() if v)
@@ -80,8 +65,34 @@ def _collect_text(spec: dict) -> str:
 
 
 def detect_blockers(spec: dict) -> list[str]:
-    text = _collect_text(spec)
-    return [p.pattern for p in BLOCKER_PATTERNS if p.search(text)]
+    return _detect_blockers_from_text(_collect_text(spec))
+
+
+def _sanitize_value(value):
+    if isinstance(value, str):
+        return _CMS_REPLACE.sub("custom static site", value)
+    if isinstance(value, list):
+        return [_sanitize_value(v) for v in value]
+    if isinstance(value, dict):
+        return {k: _sanitize_value(v) for k, v in value.items()}
+    return value
+
+
+def sanitize_build_spec(spec: dict) -> dict:
+    """Replace CMS platform names in copy so validation/build does not fail on stale thread text."""
+    if not isinstance(spec, dict):
+        return spec
+    out = copy.deepcopy(spec)
+    for key in ("site_name", "tagline", "summary"):
+        if isinstance(out.get(key), str):
+            out[key] = _CMS_REPLACE.sub("custom static site", out[key])
+    if isinstance(out.get("pages"), list):
+        out["pages"] = _sanitize_value(out["pages"])
+    if isinstance(out.get("sections"), list):
+        out["sections"] = _sanitize_value(out["sections"])
+    if isinstance(out.get("contact"), dict):
+        out["contact"] = _sanitize_value(out["contact"])
+    return out
 
 
 def validate_build_spec(spec: dict) -> tuple[bool, str]:

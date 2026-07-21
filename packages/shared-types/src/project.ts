@@ -24,6 +24,8 @@ export interface ProjectJson {
   client_confirmed: boolean;
   /** Free-form notes that do not fit elsewhere. */
   notes: string | null;
+  /** Requests the client made that are outside Agent 2 capabilities. */
+  out_of_scope_requests?: string[];
   /** Member choice after brief readiness (extension popup or dashboard). */
   brief_decision?: BriefDecisionAction | null;
   /** Internal: marketplace thread id when DB column is unavailable. */
@@ -43,6 +45,7 @@ export function emptyProjectJson(): ProjectJson {
     status: "new",
     client_confirmed: false,
     notes: null,
+    out_of_scope_requests: [],
   };
 }
 

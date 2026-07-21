@@ -26,8 +26,9 @@ Inbox message text (from extension)
 The evolving structured understanding of one client conversation. Shape is in
 `packages/shared-types` (`ProjectJson`). Key fields: `client_name`,
 `client_username` (marketplace handle from the extension), `platform`,
-`summary`, `requirements[]`, `open_questions[]`, `budget`, `deadline`, `status`
-(`new`/`negotiating`/`deal`/`done`), `client_confirmed`, `notes`.
+`summary`, `requirements[]`, `open_questions[]`, `out_of_scope_requests[]`
+(things the client asked for that Agent 2 cannot build), `budget`, `deadline`,
+`status` (`new`/`negotiating`/`deal`/`done`), `client_confirmed`, `notes`.
 
 - **CALL 1 Extract** merges new inbox text into the existing `project_json` (never
   blindly overwrites; appends/refines requirements and open questions).
@@ -69,13 +70,46 @@ Types: `BriefDecisionAction` in `packages/shared-types`.
   in the dashboard take effect immediately, no caching.
 - Drafts must honor `never_say[]` and `always_do`, and match `tone`, `title`,
   `specialty`, `experience_years`, `location`.
+- Draft system prompt lives in `apps/backend/app/prompts/agent1_draft.txt` and is
+  filled with persona fields, negotiation **stage**, platform label, and the
+  capabilities block (see below).
+
+## Stage-aware draft
+
+Parallel **Stage detect** (GPT-mini) labels the inbox turn as one of:
+`new`, `discovery`, `negotiation`, `order`, `delivery`, `revision`.
+
+Draft receives this stage plus **all previous_replies** in the thread so wording
+does not repeat. Stage also nudges `project_json.status` (e.g. `order` → `deal`
+when appropriate).
+
+## Humanization layer
+
+Draft quality is enforced by two layers:
+
+1. **Static prompt** — `apps/backend/app/prompts/agent1_draft.txt` with strict
+   human-texting rules (greet once, question budget, length variation, CMS name
+   ban) and embedded GOOD vs BAD few-shot pairs.
+2. **Dynamic constraints** — `_conversation_state()` in `pipeline.py` computes
+   per-reply orders from the thread (already greeted, name overuse, consecutive
+   questions, recent reply length, banned openers already used) and injects them
+   into the system prompt via `{conversation_state}`.
+
+Draft runs at `temperature=0.9` for natural variation.
 
 ## Scope guard
 
-Agent 1 must not over-promise. Replies stay within what Agent 2 can actually
-build (see `04-agent2.md` capabilities). If a client asks for something out of
-scope, the draft steers toward a supported alternative or flags it as an open
-question rather than committing.
+Single source of truth: `packages/shared-types/src/capabilities.ts` (mirrored in
+`apps/backend/app/services/ai/capabilities.py`).
+
+- **Five offerings** (business, landing, restaurant, portfolio, event) — shown in
+  Agent Setup and injected into Extract/Draft/Brief prompts via
+  `capabilities_prompt_block()`.
+- **CAN / CANNOT** lists with suggested alternatives for out-of-scope asks.
+- **Extract** records unsupported requests in `out_of_scope_requests[]`.
+- **Draft** declines politely and steers toward a supported offering; never
+  commits to WordPress, mobile apps, auth, payments, etc.
+- **Blocker patterns** are shared with Agent 2 validation (see `04-agent2.md`).
 
 ## Few-shot examples
 

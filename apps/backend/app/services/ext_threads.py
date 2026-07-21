@@ -450,7 +450,13 @@ async def process_thread(sb, user_id: str, body: dict) -> dict:
         or {}
     )
 
-    draft_text, draft_mode = await ai.draft(persona, updated, inbox_text)
+    draft_text, draft_mode = await ai.draft(
+        persona,
+        updated,
+        inbox_text,
+        stage=stage,
+        platform=platform,
+    )
 
     last_incoming = messages[-1] if messages else None
     if (

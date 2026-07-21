@@ -5,6 +5,7 @@ from __future__ import annotations
 import base64
 import hashlib
 import logging
+import shutil
 from pathlib import Path
 
 import httpx
@@ -12,6 +13,8 @@ import httpx
 from app.config import settings
 
 logger = logging.getLogger(__name__)
+
+PREVIEWS_ROOT = Path(__file__).resolve().parent.parent.parent.parent / ".previews"
 
 VERCEL_API = "https://api.vercel.com"
 
@@ -85,8 +88,15 @@ async def deploy_preview(slug: str, dist_dir: Path) -> tuple[str | None, str]:
     preview_url = f"https://{slug}.{domain}"
 
     if not settings.vercel_token:
-        logger.info("VERCEL_TOKEN not set — returning preview URL pattern only")
-        return preview_url, "local"
+        logger.info("VERCEL_TOKEN not set — serving preview from local static files")
+        target = PREVIEWS_ROOT / slug
+        if target.exists():
+            shutil.rmtree(target)
+        PREVIEWS_ROOT.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(dist_dir, target)
+        base = settings.public_api_url.rstrip("/")
+        local_url = f"{base}/previews/{slug}/"
+        return local_url, "local"
 
     files = _collect_files(dist_dir)
     if not files:

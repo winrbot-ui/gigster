@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState, useTransition } from "react";
+import { formatMarketplaceHandles } from "@gigster/shared-types";
 import {
   approveMarketerFormAction,
   deactivateSubscriptionFormAction,
@@ -11,6 +12,7 @@ import {
   updateUsernameAction,
   verifyPaymentFormAction,
   type AdminActionState,
+  type MemberMarketplaceProfile,
 } from "@/app/actions/admin";
 import { PageHeader } from "@/components/app/app-shell";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -41,6 +43,7 @@ export interface AdminDashboardProps {
     expires_at: string;
     users: { email: string; username: string; status: string } | null;
   }>;
+  memberProfiles: MemberMarketplaceProfile[];
 }
 
 export function AdminDashboard({
@@ -48,6 +51,7 @@ export function AdminDashboard({
   payments,
   applications,
   subscriptions,
+  memberProfiles,
 }: AdminDashboardProps) {
   const [usernameState, usernameAction, usernamePending] = useActionState<
     AdminActionState,
@@ -55,7 +59,16 @@ export function AdminDashboard({
   >(updateUsernameAction, {});
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<
-    Array<{ id: string; email: string; username: string; status: string }>
+    Array<{
+      id: string;
+      email: string;
+      username: string;
+      status: string;
+      agent_personas:
+        | { fiverr_username: string; freelancer_username: string }
+        | { fiverr_username: string; freelancer_username: string }[]
+        | null;
+    }>
   >([]);
   const [selectedUserId, setSelectedUserId] = useState("");
   const [isSearching, startSearch] = useTransition();
@@ -66,6 +79,12 @@ export function AdminDashboard({
       setSearchResults(results);
       if (results.length === 1) setSelectedUserId(results[0]!.id);
     });
+  }
+
+  function personaFromSearch(row: (typeof searchResults)[number]) {
+    const p = row.agent_personas;
+    if (!p) return null;
+    return Array.isArray(p) ? p[0] : p;
   }
 
   return (
@@ -94,6 +113,50 @@ export function AdminDashboard({
           </CardHeader>
         </Card>
       </div>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>Marketplace usernames</CardTitle>
+          <CardDescription>
+            Fiverr / Freelancer handles from Agent setup — saved in{" "}
+            <code className="text-xs">agent_personas</code>.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3">
+          {memberProfiles.length === 0 && (
+            <p className="text-sm text-muted">No persona rows yet.</p>
+          )}
+          {memberProfiles.map((row) => (
+            <div
+              key={row.user_id}
+              className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-border p-4"
+            >
+              <div>
+                <p className="font-medium">
+                  @{row.username || "—"} · {row.agent_name || "No agent name"}
+                </p>
+                <p className="text-xs text-muted">{row.email}</p>
+                <p className="mt-1 text-sm">{formatMarketplaceHandles(row)}</p>
+                <p className="mt-1 text-xs text-muted">
+                  Updated {new Date(row.updated_at).toLocaleString()}
+                  {row.status ? ` · ${row.status.replace("_", " ")}` : ""}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {row.fiverr_username ? (
+                  <Badge tone="neutral">Fiverr: {row.fiverr_username}</Badge>
+                ) : null}
+                {row.freelancer_username ? (
+                  <Badge tone="neutral">Freelancer: {row.freelancer_username}</Badge>
+                ) : null}
+                {!row.fiverr_username && !row.freelancer_username ? (
+                  <Badge tone="accent">Missing marketplace username</Badge>
+                ) : null}
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
 
       <Card className="mt-6">
         <CardHeader>
@@ -210,6 +273,9 @@ export function AdminDashboard({
                   }`}
                 >
                   @{u.username} · {u.email} · {u.status}
+                  <span className="mt-1 block text-xs text-muted">
+                    {formatMarketplaceHandles(personaFromSearch(u))}
+                  </span>
                 </button>
               ))}
             </div>

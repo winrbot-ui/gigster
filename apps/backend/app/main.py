@@ -1,9 +1,20 @@
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from app.config import settings
 from app.routers import ai, notifications, cron, agent2, telegram_webhook, auth_ext, ext
 
 app = FastAPI(title="Gigster API", version="0.1.0")
+
+_previews_dir = Path(__file__).resolve().parent.parent / ".previews"
+_previews_dir.mkdir(parents=True, exist_ok=True)
+app.mount(
+    "/previews",
+    StaticFiles(directory=str(_previews_dir), html=True),
+    name="previews",
+)
 
 origins = [o.strip() for o in settings.cors_origins.split(",") if o.strip()]
 extension_origins = [

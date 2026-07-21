@@ -103,6 +103,26 @@ async function syncActiveThread({ pendingDraft, username: explicitUsername } = {
   }
 }
 
+async function recheckMembership() {
+  const result = await syncActiveThread();
+  if (!result) {
+    return { ok: false, error: "Open the Fiverr chat for this deal, then recheck." };
+  }
+  const data = await chrome.storage.local.get(KEYS.lastDraft);
+  const last = data[KEYS.lastDraft] || {};
+  await chrome.storage.local.set({
+    [KEYS.lastDraft]: {
+      ...last,
+      project_id: result.project_id ?? last.project_id,
+      readiness: result.readiness ?? last.readiness,
+      payment_required: result.payment_required,
+      awaiting_brief_decision: result.awaiting_brief_decision,
+      brief_decision: result.project_json?.brief_decision ?? last.brief_decision,
+    },
+  });
+  return { ok: true, payment_required: Boolean(result.payment_required) };
+}
+
 async function handleUserReplied(username) {
   const state = await getQueueState();
   if (!state.running || state.phase !== "waiting_reply") return;
@@ -554,6 +574,12 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     syncActiveThread({ pendingDraft: msg.pendingDraft, username: msg.username })
       .catch(() => {})
       .finally(() => sendResponse({ ok: true }));
+    return true;
+  }
+  if (msg?.type === "RECHECK_MEMBERSHIP") {
+    recheckMembership()
+      .then((r) => sendResponse(r))
+      .catch((e) => sendResponse({ ok: false, error: e.message }));
     return true;
   }
   if (msg?.type === "DRAFT_CURRENT") {

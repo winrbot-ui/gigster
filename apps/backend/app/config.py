@@ -44,6 +44,10 @@ class Settings(BaseSettings):
     resend_api_key: str = ""
     resend_from: str = "Gigster <noreply@gigster.website>"
     site_url: str = "https://www.gigster.website"
+    public_api_url: str = Field(
+        default="http://localhost:8000",
+        validation_alias=AliasChoices("PUBLIC_API_URL"),
+    )
 
 
 settings = Settings()

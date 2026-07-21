@@ -33,6 +33,7 @@
 # agent2 build output (regenerated)
 apps/backend/app/services/agent2/templates/site-builder/dist/
 apps/backend/app/services/agent2/templates/site-builder/data/
+apps/backend/.previews/
 
 # python
 **/__pycache__/

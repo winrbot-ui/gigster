@@ -1,6 +1,6 @@
 {
   "name": "@gigster/extension-fiverr",
-  "version": "0.6.1",
+  "version": "0.6.3",
   "private": true,
   "description": "Gigster Fiverr — inbox extension",
   "scripts": {

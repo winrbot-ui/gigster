@@ -121,7 +121,25 @@ async def brief_decision(
 
     if action in ("build", "both"):
         if not proj.get("build_spec"):
-            build_spec = await ai.brief(project_json, proj.get("preview_slug"))
+            persona = first_row(
+                sb.table("agent_personas")
+                .select("*")
+                .eq("user_id", user_id)
+                .limit(1)
+                .execute()
+            )
+            thread_id = proj.get("thread_id") or (project_json.get("_thread_id"))
+            platform = proj.get("platform") or project_json.get("platform") or ""
+            conversation = ""
+            if thread_id and platform:
+                msgs = ext_threads.load_thread_messages(sb, user_id, platform, thread_id)
+                conversation = ai.messages_to_inbox_text(msgs)
+            build_spec = await ai.brief(
+                project_json,
+                proj.get("preview_slug"),
+                persona=persona,
+                conversation=conversation,
+            )
             sb.table("projects").update({"build_spec": build_spec}).eq("id", body.project_id).execute()
         agent2 = await enqueue_agent2(body.project_id, notify_chat_id=chat_id)
         result["agent2"] = agent2
@@ -187,7 +205,7 @@ async def get_agent2_status(
 
     proj = first_row(
         sb.table("projects")
-        .select("id, agent2_status, preview_url, preview_slug")
+        .select("id, agent2_status, preview_url, preview_slug, project_json")
         .eq("id", project_id)
         .eq("user_id", user_id)
         .limit(1)

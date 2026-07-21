@@ -57,8 +57,9 @@ brief document + Agent 2 site build) always requires an `active` subscription.
 Live persona for Agent 1 (read live, never cached).
 
 `user_id` PK FK→users · `agent_name` · `full_name` · `title` · `specialty` ·
-`tone` · `experience_years` int · `location` · `never_say` text[] · `always_do`
-text · `updated_at`.
+`tone` · `experience_years` int · `location` · `fiverr_username` text ·
+`freelancer_username` text (at least one marketplace handle required on save in
+Agent setup) · `never_say` text[] · `always_do` text · `updated_at`.
 
 ### `invite_codes`
 `id` PK · `owner_id` FK→users · `code` text unique · `uses_remaining` int ·

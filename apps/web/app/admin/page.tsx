@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import {
   getAdminStats,
   getMarketerApplications,
+  getMemberMarketplaceProfiles,
   getMemberSubscriptions,
   getPendingPayments,
 } from "@/app/actions/admin";
@@ -12,11 +13,13 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminOverviewPage() {
-  const [stats, payments, applications, subscriptions] = await Promise.all([
+  const [stats, payments, applications, subscriptions, memberProfiles] =
+    await Promise.all([
     getAdminStats(),
     getPendingPayments(),
     getMarketerApplications(),
     getMemberSubscriptions(),
+    getMemberMarketplaceProfiles(),
   ]);
 
   return (
@@ -25,6 +28,7 @@ export default async function AdminOverviewPage() {
       payments={(payments ?? []) as Parameters<typeof AdminDashboard>[0]["payments"]}
       applications={applications ?? []}
       subscriptions={(subscriptions ?? []) as Parameters<typeof AdminDashboard>[0]["subscriptions"]}
+      memberProfiles={memberProfiles ?? []}
     />
   );
 }

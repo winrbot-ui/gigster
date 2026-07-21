@@ -157,6 +157,26 @@ async function triggerBriefDecision(action) {
   }
 }
 
+async function recheckMembership() {
+  const btn = $("recheck-membership-btn");
+  const statusEl = $("brief-lock-status");
+  btn.disabled = true;
+  statusEl.textContent = "Checking membership…";
+  try {
+    const res = await bgSend({ type: "RECHECK_MEMBERSHIP" });
+    if (res?.ok && !res.payment_required) {
+      statusEl.textContent = "Membership active — unlocking…";
+    } else if (res?.ok) {
+      statusEl.textContent =
+        "Still locked — payment not verified yet. Recheck after your membership is activated.";
+    } else {
+      statusEl.textContent = res?.error || "Open the Fiverr chat, then recheck.";
+    }
+  } finally {
+    btn.disabled = false;
+  }
+}
+
 async function pollAgent2(projectId) {
   for (let i = 0; i < 60; i++) {
     const st = await getAgent2Status(projectId);
@@ -282,6 +302,8 @@ for (const [id, action] of [
 ]) {
   $(id).addEventListener("click", () => triggerBriefDecision(action));
 }
+
+$("recheck-membership-btn").addEventListener("click", () => void recheckMembership());
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== "local") return;

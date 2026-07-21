@@ -15,9 +15,9 @@ Member chooses build or both (POST /ext/brief/decision)
         │
         ▼ Validate      schema + capabilities, no blockers
         │
-        ▼ Pick template   business / landing / restaurant
+        ▼ Pick template   business / landing / restaurant / portfolio / event
         │
-        ▼ Generate        Claude produces the site from the template + spec
+        ▼ Generate        Claude produces the site (template + spec + project/persona context)
         │
         ▼ Build           npm install + build, max 3 retries
         │
@@ -48,7 +48,7 @@ Agent 2 run.
 
 See the `BuildSpec` type in `packages/shared-types`:
 
-- `template`: `business` | `landing` | `restaurant`
+- `template`: `business` | `landing` | `restaurant` | `portfolio` | `event`
 - `site_name`, `tagline`
 - `sections[]`: ordered list, each `{ kind, content }`
 - `theme`: `{ primary, accent, dark }`
@@ -60,7 +60,9 @@ Agent 2 may only emit these section kinds:
 
 ```
 hero, services, about_story, team, contact_form, cta, faq,
-pricing, gallery, testimonials, menu, embed, blog_list
+pricing, gallery, testimonials, menu, embed, blog_list,
+stats, features, process, video, map, hours, social_links,
+logos, booking_embed, newsletter
 ```
 
 Defined as `SECTION_KINDS` in `packages/shared-types`. Adding a section kind is a
@@ -68,13 +70,28 @@ deliberate change: update the type, this doc, and the generator together.
 
 ## Capabilities (can / cannot)
 
-**Can:** static marketing/business/restaurant/landing sites from the section
-vocabulary; contact form (submission handled by backend); basic theming; embeds.
+Canonical lists live in `packages/shared-types/src/capabilities.ts` (Python mirror:
+`apps/backend/app/services/ai/capabilities.py`).
 
-**Cannot (blockers — fail validation):** auth/login, databases/user accounts,
-payments/checkout, custom backends, real-time features, anything outside the
-section vocabulary. Agent 1's scope guard (see `03-ai-pipeline.md`) keeps
-promises inside these limits.
+**Can:** static marketing sites across five templates; contact forms; theming;
+YouTube/Calendly/Google Maps embeds (`video`, `booking_embed`, `map`); gallery
+images; newsletter signup UI; premium renderer (Google Fonts, scroll reveal, OG
+meta) in `site-builder/build.mjs`.
+
+**Cannot (blockers — fail validation):** WordPress/CMS handoff, mobile/native apps,
+auth/login, databases/user accounts, payments/checkout, custom backends,
+real-time/chat, SaaS dashboards, anything outside the section vocabulary.
+Validation scans all spec text (site name, tagline, summary, section content,
+contact fields) via regex patterns in `BLOCKER_PATTERNS`.
+
+**Generate step:** `apps/backend/app/prompts/agent2_generate.txt` receives full
+`project_json` and persona context so section copy reflects the negotiated brief.
+
+## Local preview (no Vercel token)
+
+When `VERCEL_TOKEN` is unset, deploy copies the built site to
+`apps/backend/.previews/{slug}/` and the backend serves it at
+`GET /previews/{slug}/` for local dev and the simulator.
 
 ## Build retries
 

@@ -6,6 +6,7 @@ import json
 import logging
 import shutil
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
@@ -13,6 +14,18 @@ logger = logging.getLogger(__name__)
 
 TEMPLATE_DIR = Path(__file__).resolve().parent / "templates" / "site-builder"
 MAX_RETRIES = 3
+
+
+def _resolve_npm() -> str:
+    """Full path to npm — bare ``npm`` fails on Windows (WinError 2) without shell."""
+    npm = shutil.which("npm")
+    if npm:
+        return npm
+    if sys.platform == "win32":
+        npm_cmd = shutil.which("npm.cmd")
+        if npm_cmd:
+            return npm_cmd
+    return "npm"
 
 
 def _run(cmd: list[str], cwd: Path) -> tuple[int, str]:
@@ -48,14 +61,14 @@ def build_site(spec: dict, retries: int = MAX_RETRIES) -> tuple[Path | None, str
             data_dir.mkdir(exist_ok=True)
             (data_dir / "site.json").write_text(json.dumps(spec, indent=2), encoding="utf-8")
 
-            code, out = _run(["npm", "install", "--omit=dev"], work_dir)
+            code, out = _run([_resolve_npm(), "install", "--omit=dev"], work_dir)
             if code != 0:
                 last_error = f"npm install failed (attempt {attempt}): {out[-2000:]}"
                 logger.warning(last_error)
                 shutil.rmtree(work_dir, ignore_errors=True)
                 continue
 
-            code, out = _run(["npm", "run", "build"], work_dir)
+            code, out = _run([_resolve_npm(), "run", "build"], work_dir)
             dist = work_dir / "dist"
             if code != 0 or not (dist / "index.html").exists():
                 last_error = f"npm run build failed (attempt {attempt}): {out[-2000:]}"

@@ -12,6 +12,11 @@ from app.services.telegram import notify_site_ready
 logger = logging.getLogger(__name__)
 
 _running: set[str] = set()
+_last_errors: dict[str, str] = {}
+
+
+def get_agent2_error(project_id: str) -> str | None:
+    return _last_errors.get(project_id)
 
 
 async def enqueue_agent2(project_id: str, *, notify_chat_id: str | None = None) -> dict:
@@ -31,6 +36,10 @@ async def enqueue_agent2(project_id: str, *, notify_chat_id: str | None = None) 
 async def _run_job(project_id: str, *, notify_chat_id: str | None = None) -> None:
     try:
         result = await run_agent2(project_id)
+        if result.get("ok"):
+            _last_errors.pop(project_id, None)
+        else:
+            _last_errors[project_id] = str(result.get("error") or "Build failed")
         if result.get("ok") and notify_chat_id:
             sb = get_supabase_optional()
             if sb:
@@ -47,16 +56,21 @@ async def _run_job(project_id: str, *, notify_chat_id: str | None = None) -> Non
                         proj.data.get("client_name") or "Client",
                         proj.data.get("preview_url") or result.get("preview_url") or "",
                     )
-    except Exception:
+    except Exception as exc:
         logger.exception("Background Agent 2 failed for %s", project_id)
+        _last_errors[project_id] = str(exc)
     finally:
         _running.discard(project_id)
 
 
 def agent2_status_for(project: dict) -> dict:
+    project_id = project.get("id")
+    project_json = project.get("project_json") or {}
+    persisted_error = project_json.get("agent2_last_error")
     return {
         "status": project.get("agent2_status") or "idle",
         "preview_url": project.get("preview_url"),
         "preview_slug": project.get("preview_slug"),
-        "running": project.get("id") in _running,
+        "running": project_id in _running,
+        "error": (_last_errors.get(project_id) if project_id else None) or persisted_error,
     }

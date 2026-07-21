@@ -29,6 +29,22 @@ for (const { app, zip } of extensions) {
     throw new Error(`Missing dist for ${app}`);
   }
 
+  const configPath = join(dist, "src/config.local.js");
+  if (existsSync(configPath)) {
+    const configText = readFileSync(configPath, "utf8");
+    if (/localhost/i.test(configText)) {
+      throw new Error(
+        `Client store build rejected: ${configPath} still points to localhost. Re-run setup --production.`,
+      );
+    }
+  }
+
+  const devMarker = join(dist, "DEV-NOT-FOR-CLIENTS.txt");
+  if (existsSync(devMarker)) {
+    rmSync(devMarker);
+    console.log("  removed DEV-NOT-FOR-CLIENTS.txt");
+  }
+
   // Chrome Web Store rejects manifest "key" (dev-only for stable unpacked ID).
   const manifestPath = join(dist, "manifest.json");
   const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));

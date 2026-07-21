@@ -311,6 +311,56 @@ export async function getAdminStats() {
   };
 }
 
+export type MemberMarketplaceProfile = {
+  user_id: string;
+  fiverr_username: string;
+  freelancer_username: string;
+  agent_name: string;
+  updated_at: string;
+  email: string;
+  username: string;
+  status: string;
+};
+
+function normalizeUserJoin(
+  users: unknown,
+): { email: string; username: string; status: string } | null {
+  if (!users) return null;
+  if (Array.isArray(users)) {
+    const row = users[0];
+    return row && typeof row === "object" ? (row as { email: string; username: string; status: string }) : null;
+  }
+  return users as { email: string; username: string; status: string };
+}
+
+export async function getMemberMarketplaceProfiles(): Promise<MemberMarketplaceProfile[]> {
+  await requireRole("admin");
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("agent_personas")
+    .select(
+      "user_id, fiverr_username, freelancer_username, agent_name, updated_at, users(email, username, status)",
+    )
+    .order("updated_at", { ascending: false });
+  if (error) {
+    console.error("getMemberMarketplaceProfiles:", error.message);
+    return [];
+  }
+  return (data ?? []).map((row) => {
+    const user = normalizeUserJoin(row.users);
+    return {
+      user_id: row.user_id,
+      fiverr_username: row.fiverr_username ?? "",
+      freelancer_username: row.freelancer_username ?? "",
+      agent_name: row.agent_name ?? "",
+      updated_at: row.updated_at,
+      email: user?.email ?? "",
+      username: user?.username ?? "",
+      status: user?.status ?? "",
+    };
+  });
+}
+
 export async function getPendingPayments() {
   await requireRole("admin");
   const admin = createAdminClient();
@@ -356,7 +406,7 @@ export async function searchUsers(query: string) {
   const admin = createAdminClient();
   const { data } = await admin
     .from("users")
-    .select("id, email, username, status")
+    .select("id, email, username, status, agent_personas(fiverr_username, freelancer_username)")
     .or(`username.ilike.%${cleaned}%,email.ilike.%${cleaned}%`)
     .limit(10);
   return data ?? [];

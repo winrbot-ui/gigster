@@ -18,11 +18,27 @@ export const SECTION_KINDS = [
   "menu",
   "embed",
   "blog_list",
+  "stats",
+  "features",
+  "process",
+  "video",
+  "map",
+  "hours",
+  "social_links",
+  "logos",
+  "booking_embed",
+  "newsletter",
 ] as const;
 export type SectionKind = (typeof SECTION_KINDS)[number];
 
 /** Templates Agent 2 can pick from. */
-export const BUILD_TEMPLATES = ["business", "landing", "restaurant"] as const;
+export const BUILD_TEMPLATES = [
+  "business",
+  "landing",
+  "restaurant",
+  "portfolio",
+  "event",
+] as const;
 export type BuildTemplate = (typeof BUILD_TEMPLATES)[number];
 
 export interface BuildSection {

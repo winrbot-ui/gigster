@@ -2,21 +2,28 @@
 
 Fiverr inbox extension (v0.6.1). Manual = AI draft, you send. Auto = extension sends on Fiverr.
 
-## Local dev
+## Client build (Chrome Web Store — what members get)
 
 ```bash
-npm run setup:extension          # apiBase from apps/web/.env.local (localhost)
-npm run build:extension:fiverr
+npm run extension:client
 ```
 
-Load unpacked: `apps/extension-fiverr/dist`
+Upload `release/gigster-fiverr.zip`. See [CLIENT.md](./CLIENT.md) and [docs/09-extension-dev-vs-client.md](../../docs/09-extension-dev-vs-client.md).
 
-## Production / Chrome Web Store
+## Local dev (internal only — not for clients)
 
 ```bash
-npm run build:extension:store    # → release/gigster-fiverr.zip
+npm run extension:dev:fiverr
 ```
 
-Then upload zip to [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole).
+Load unpacked: `apps/extension-fiverr/dist` (contains `DEV-NOT-FOR-CLIENTS.txt`).
+
+Backend dev env: copy from `.env.extension.dev.example`.
+
+## Production / Chrome Web Store (legacy alias)
+
+```bash
+npm run build:extension:store    # same as extension:client → release/gigster-fiverr.zip
+```
 
 After install, add the extension **ID** to Railway `CORS_EXTENSION_IDS`. See `docs/08-deploy-live.md` §13.
