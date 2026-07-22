@@ -7,7 +7,7 @@ Copy-paste guide. Developer Dashboard → **New item** → upload zip → **Stor
 ## Upload package first
 
 ```
-C:\Users\kosta\Desktop\gigster_website\release\gigster-freelancer.zip
+release/gigster-freelancer.zip
 ```
 
 (Run `npm run build:extension:store` if missing.)
@@ -49,7 +49,7 @@ After your first deal, activate membership to unlock the client brief (PDF) and 
 ### Store icon (128×128)
 
 ```
-C:\Users\kosta\Desktop\gigster_website\apps\extension-freelancer\store-assets\icon128.png
+apps/extension-freelancer/store-assets/icon128.png
 ```
 
 ### Screenshot (1280×800 required)
@@ -57,7 +57,7 @@ C:\Users\kosta\Desktop\gigster_website\apps\extension-freelancer\store-assets\ic
 Upload **only** from `release/store-upload/` (exact dimensions verified):
 
 ```
-C:\Users\kosta\Desktop\gigster_website\release\store-upload\gigster-freelancer-screenshot-1280x800.png
+release/store-upload/gigster-freelancer-screenshot-1280x800.png
 ```
 
 If that fails, try the 640×400 file in the same folder.

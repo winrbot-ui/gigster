@@ -1,11 +1,11 @@
 # Deploy live — gigster.website on Vercel
 
-Repo: `https://github.com/winrbot-ui/gigster`  
+Repo: your connected GitHub repository (monorepo root)  
 Live domain: **`https://www.gigster.website`**
 
 ## 1. Vercel project settings
 
-Open: **vercel.com → winrbot-ui → gigster-web → Settings**
+Open: **Vercel dashboard → your team → web project (`apps/web`) → Settings**
 
 | Setting | Value |
 |---------|--------|
@@ -71,7 +71,7 @@ Run all SQL files in order (SQL Editor → New query → paste → Run):
 
 ## 9. Railway backend (`apps/backend`)
 
-1. **railway.app** → New → **GitHub Repository** → `winrbot-ui/gigster`
+1. **railway.app** → New → **GitHub Repository** → select this monorepo
 2. Service **Settings → Root Directory:** `apps/backend`
 3. Service **Settings → Config file path:** `/apps/backend/railway.toml`  
    (Railway does **not** auto-load config from Root Directory — this step is required.)

@@ -11,7 +11,7 @@
 
 ## 1. Vercel (web)
 
-1. [vercel.com/new](https://vercel.com/new) → Import `winrbot-ui/gigster`
+1. [vercel.com/new](https://vercel.com/new) → Import this GitHub repository
 2. **Root Directory:** `apps/web` (required for monorepo)
 3. Framework: Next.js (auto-detected). `vercel.json` sets install/build from repo root.
 4. **Environment variables** (Production):
@@ -31,7 +31,7 @@
 
 ## 2. Railway (backend)
 
-1. [railway.app/new](https://railway.app/new) → Deploy from GitHub → `winrbot-ui/gigster`
+1. [railway.app/new](https://railway.app/new) → Deploy from GitHub → select this repository
 2. **Root Directory:** `apps/backend`
 3. Railway uses `Dockerfile` + `railway.toml` (health check on `/health`)
 4. **Variables** — copy from `apps/backend/.env.example`

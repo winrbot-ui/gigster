@@ -38,30 +38,16 @@ After your first deal, activate membership to unlock the client brief (PDF) and 
 
 ### Store icon (128×128) — required
 
-Upload this file:
+Upload from repo root (paths relative to monorepo):
 
 ```
 apps/extension-fiverr/store-assets/icon128.png
 ```
 
-Full path:
-
-```
-C:\Users\kosta\Desktop\gigster_website\apps\extension-fiverr\store-assets\icon128.png
-```
-
 ### Screenshots — at least 1 required (1280×800 or 640×400)
-
-Upload this file:
 
 ```
 apps/extension-fiverr/store-assets/screenshot-1280x800.png
-```
-
-Full path:
-
-```
-C:\Users\kosta\Desktop\gigster_website\apps\extension-fiverr\store-assets\screenshot-1280x800.png
 ```
 
 ---
