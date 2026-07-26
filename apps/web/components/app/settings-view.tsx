@@ -90,13 +90,13 @@ export function SettingsView({
 
       <div className="flex flex-col gap-6">
         <Card>
-          <CardContent className="flex flex-wrap items-center gap-5 py-6">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-accent/15 text-xl font-semibold text-accent-strong">
+          <CardContent className="flex flex-wrap items-center gap-4 py-5 sm:gap-5 sm:py-6">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-accent/15 text-lg font-semibold text-accent-strong sm:h-16 sm:w-16 sm:text-xl">
               {initials(user.username)}
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
               <p className="font-mono text-lg text-accent-strong">@{user.username}</p>
-              <p className="text-sm text-muted">{user.email}</p>
+              <p className="truncate text-sm text-muted">{user.email}</p>
               <div className="mt-1 flex flex-wrap items-center gap-2">
                 <Badge tone={statusTone}>{STATUS_LABEL[user.status]}</Badge>
                 <span className="text-xs text-muted">
@@ -107,8 +107,29 @@ export function SettingsView({
           </CardContent>
         </Card>
 
+        <div className="grid gap-3 sm:hidden">
+          <Link
+            href="/agent-setup"
+            className="flex items-center justify-between rounded-[var(--radius-card)] border border-border bg-surface px-4 py-3.5 text-sm font-medium text-foreground hover:bg-surface-2"
+          >
+            <span>{persona ? "Edit AI persona" : "Set up AI persona"}</span>
+            <span className="text-muted" aria-hidden>
+              →
+            </span>
+          </Link>
+          <a
+            href="#change-password"
+            className="flex items-center justify-between rounded-[var(--radius-card)] border border-border bg-surface px-4 py-3.5 text-sm font-medium text-foreground hover:bg-surface-2"
+          >
+            <span>Change password</span>
+            <span className="text-muted" aria-hidden>
+              →
+            </span>
+          </a>
+        </div>
+
         <div className="grid gap-6 lg:grid-cols-2">
-          <Card>
+          <Card className="order-2 lg:order-1">
             <CardHeader>
               <CardTitle>Membership</CardTitle>
               <CardDescription>
@@ -200,7 +221,7 @@ export function SettingsView({
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="order-1 lg:order-2">
             <CardHeader>
               <CardTitle>AI persona</CardTitle>
               <CardDescription>
@@ -237,7 +258,7 @@ export function SettingsView({
           </Card>
         </div>
 
-        <Card>
+        <Card id="change-password">
           <CardHeader>
             <CardTitle>Change password</CardTitle>
             <CardDescription>
