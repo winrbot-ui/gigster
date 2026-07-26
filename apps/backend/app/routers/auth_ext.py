@@ -62,11 +62,15 @@ async def extension_login(body: ExtensionLoginRequest):
             json={"email": email, "password": body.password},
         )
 
+    try:
+        data = res.json()
+    except Exception:
+        raise HTTPException(502, "Auth service returned invalid response")
+
     if res.status_code != 200:
-        detail = res.json().get("error_description") or res.json().get("msg") or "Login failed"
+        detail = data.get("error_description") or data.get("msg") or data.get("error") or "Login failed"
         raise HTTPException(401, detail)
 
-    data = res.json()
     sb = get_supabase_optional()
     profile = None
     if sb and data.get("user", {}).get("id"):
@@ -106,11 +110,15 @@ async def refresh_token(body: RefreshTokenRequest):
             json={"refresh_token": body.refresh_token},
         )
 
+    try:
+        data = res.json()
+    except Exception:
+        raise HTTPException(502, "Auth service returned invalid response")
+
     if res.status_code != 200:
-        detail = res.json().get("error_description") or res.json().get("msg") or "Refresh failed"
+        detail = data.get("error_description") or data.get("msg") or data.get("error") or "Refresh failed"
         raise HTTPException(401, detail)
 
-    data = res.json()
     return {
         "access_token": data["access_token"],
         "refresh_token": data.get("refresh_token"),
